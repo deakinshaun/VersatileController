@@ -32,3 +32,7 @@ Using the Controller with your own license key
 
 The android application needs to be rebuilt if you use a different key. This key needs to be the same in the android application, and in the Unity project that the controller connects to.
 
+Acknowledgements
+================
+
+Buttons: http://www.holshousersoftware.com/glass/
