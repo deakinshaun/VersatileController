@@ -58,3 +58,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+.vsconfig
+Photon.meta
+Photon/
+TextMesh Pro.meta
+TextMesh Pro/
