@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -217,7 +217,7 @@ GameObject:
   - component: {fileID: 996998810}
   - component: {fileID: 996998811}
   m_Layer: 0
-  m_Name: ApplicationManager
+  m_Name: VersatileControllerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -250,8 +250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatarPrefab: {fileID: 7247905527506269142, guid: d037bff06a84653478f934151680c194, type: 3}
-  chatBox: {fileID: 0}
-  inputBox: {fileID: 0}
+  systemID: General
 --- !u!1 &1944462365
 GameObject:
   m_ObjectHideFlags: 0
