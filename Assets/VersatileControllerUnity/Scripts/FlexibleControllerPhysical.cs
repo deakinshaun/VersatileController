@@ -80,7 +80,7 @@ public class FlexibleControllerPhysical : MonoBehaviourPun
     announceController ();
     if (SystemInfo.supportsGyroscope)
     {
-      Debug.Log ("Gyro active, " + photonView.IsMine + " " + PhotonNetwork.IsConnected);
+//       Debug.Log ("Gyro active, " + photonView.IsMine + " " + PhotonNetwork.IsConnected);
       if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
       {
         

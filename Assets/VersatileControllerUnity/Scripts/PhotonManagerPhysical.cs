@@ -23,8 +23,18 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
     {
       pool.ResourceCache.Add(avatarPrefab.name, avatarPrefab);
     }
+    connect ();
+  }
+
+  private void connect ()
+  {
     Debug.Log("Starting - connected status = " + PhotonNetwork.IsConnected);
     PhotonNetwork.ConnectUsingSettings();
+  }
+  
+  private void disconnect ()
+  {
+    PhotonNetwork.Disconnect ();
   }
   
   public override void OnConnectedToMaster ()
@@ -41,5 +51,18 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
     PhotonNetwork.CurrentRoom.PlayerCount + " particpants");
     
     GameObject avatar = PhotonNetwork.Instantiate(avatarPrefab.name, new Vector3(), Quaternion.identity, 0);
+  }
+  
+  void OnApplicationPause(bool pauseStatus)
+  {
+    Debug.Log ("Pause status: " + pauseStatus);
+    if (pauseStatus)
+    { 
+      disconnect ();
+    }
+    else
+    {
+      connect ();
+    }
   }
 }

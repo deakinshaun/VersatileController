@@ -67,12 +67,14 @@ public class FlexibleControllerVirtual : MonoBehaviour
     {
       buttonDownEvents = new Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> ();
       buttonUpEvents = new Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> ();
+      poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
       classInitialized = true;
     }
   }
   
   private Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> buttonDownEvents;
   private Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> buttonUpEvents;
+  private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
 
   // Use this to receive call backs whenever the named button is pressed. 
   // The callback provides the name of the button, so that the callback
@@ -120,7 +122,13 @@ public class FlexibleControllerVirtual : MonoBehaviour
   }
   
   // Event tracking for pose updates
-  
+
+  public void subscribePose (UnityAction <GameObject, Quaternion, Vector3> call)
+  {
+    classInitialize ();
+    poseEvents.AddListener (call);
+  }
+
 //   // Returns true if the provided strings match the settings for this controller.
 //   private bool validateSource (string sID, string cID)
 //   {
@@ -131,9 +139,13 @@ public class FlexibleControllerVirtual : MonoBehaviour
   [PunRPC]
   void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz, PhotonMessageInfo info)
   {
+    classInitialize ();
+    
     Quaternion o = new Quaternion(x, y, z, w);
     Vector3 p = new Vector3 (px, py, pz);
     //         Debug.Log("Got controller info: " + o.ToString ("F5") + " " + info.Sender.ToString ());
+    
+    poseEvents.Invoke (this.gameObject, o, p);
     
     if (setPose)
     {
