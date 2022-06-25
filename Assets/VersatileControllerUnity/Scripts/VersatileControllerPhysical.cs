@@ -67,7 +67,9 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   
   private Quaternion getOrientation ()
   {
-    return Quaternion.Euler (90, 0, 90) * Input.gyro.attitude * Quaternion.Euler (180, 180, 0);
+//     return Quaternion.Euler (90, 0, 90) * Input.gyro.attitude * Quaternion.Euler (180, 180, 0);
+    Quaternion q = Input.gyro.attitude;
+    return new Quaternion (-q.x, -q.z, -q.y, q.w);
   }
   
   private Vector3 getPosition ()
@@ -85,7 +87,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       {
         
         // Convert android to unity coordinates.
-        Quaternion orientation = getOrientation () * Quaternion.Inverse (restOrientation);
+        Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
         Vector3 position = getPosition () - restPosition;
         //    debug.text = orientation.ToString ("F5");
         
