@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using Photon.Pun;
 
-public class FlexibleControllerPhysical : MonoBehaviourPun
+public class VersatileControllerPhysical : MonoBehaviourPun
 {
   public TextMeshProUGUI debug;
   

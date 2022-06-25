@@ -23,8 +23,8 @@ public class ButtonPreview : MonoBehaviour
   {
     foreach (Indicators i in indicators)
     {
-      GetComponent <FlexibleControllerVirtual> ().subscribeButtonDown (i.indicatorName, switchLightOn);
-      GetComponent <FlexibleControllerVirtual> ().subscribeButtonUp (i.indicatorName, switchLightOff);
+      GetComponent <VersatileControllerVirtual> ().subscribeButtonDown (i.indicatorName, switchLightOn);
+      GetComponent <VersatileControllerVirtual> ().subscribeButtonUp (i.indicatorName, switchLightOff);
     }
   }
   
@@ -40,11 +40,11 @@ public class ButtonPreview : MonoBehaviour
     }
   }
   
-  private void switchLightOn (string name, FlexibleControllerVirtual ctl)
+  private void switchLightOn (string name, VersatileControllerVirtual ctl)
   {
     toggleLight (name, lightOn);
   }
-  private void switchLightOff (string name, FlexibleControllerVirtual ctl)
+  private void switchLightOff (string name, VersatileControllerVirtual ctl)
   {
     toggleLight (name, lightOff);
   }

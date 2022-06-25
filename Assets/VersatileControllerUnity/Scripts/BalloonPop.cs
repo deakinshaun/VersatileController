@@ -36,12 +36,12 @@ public class BalloonPop : MonoBehaviour
     public GameObject laserBeam;
   }
   private Vector3 controllerStartingPoint = new Vector3 (-1.0f, 1.0f, -6.0f);
-  private Dictionary <FlexibleControllerVirtual, ControllerState> controllers;
+  private Dictionary <VersatileControllerVirtual, ControllerState> controllers;
   
   void Start ()
   {
-    controllers = new Dictionary <FlexibleControllerVirtual, ControllerState> ();
-    FlexibleControllerVirtual.subscribeNewControllers (addController);
+    controllers = new Dictionary <VersatileControllerVirtual, ControllerState> ();
+    VersatileControllerVirtual.subscribeNewControllers (addController);
   }
   
   public void addController (GameObject controller)
@@ -57,7 +57,7 @@ public class BalloonPop : MonoBehaviour
     controllerStartingPoint += new Vector3 (1.0f, 0.0f, 0.0f);
     
     // Subscribe to button events.
-    FlexibleControllerVirtual ctl = controller.GetComponent <FlexibleControllerVirtual> ();
+    VersatileControllerVirtual ctl = controller.GetComponent <VersatileControllerVirtual> ();
     if (ctl != null)
     {
       ctl.subscribeButtonDown ("Trigger", clickedDown);
@@ -71,7 +71,7 @@ public class BalloonPop : MonoBehaviour
   }
 
   // Update state of trigger, based on information from the controller.
-  public void clickedDown (string button, FlexibleControllerVirtual ctl)
+  public void clickedDown (string button, VersatileControllerVirtual ctl)
   {
     Debug.Log ("Trigger down");
     if (controllers.ContainsKey (ctl))
@@ -79,7 +79,7 @@ public class BalloonPop : MonoBehaviour
       controllers[ctl].trigger = true;
     }
   }
-  public void clickedUp (string button, FlexibleControllerVirtual ctl)
+  public void clickedUp (string button, VersatileControllerVirtual ctl)
   {
     Debug.Log ("Trigger up");
     if (controllers.ContainsKey (ctl))
@@ -103,14 +103,14 @@ public class BalloonPop : MonoBehaviour
       g.GetComponent <MeshRenderer> ().material.color = Random.ColorHSV (0, 1, 0.5f, 1, 0.5f, 1);
     }
     
-    List <FlexibleControllerVirtual> failedControllers = new List <FlexibleControllerVirtual> ();
+    List <VersatileControllerVirtual> failedControllers = new List <VersatileControllerVirtual> ();
     
     // Check for ballons that are being pointed to, switch laser on and off, and inflate.
     // decay hiss so it stops if no button is pressed.
     hiss.volume *= 0.9f;
-    foreach (KeyValuePair <FlexibleControllerVirtual, ControllerState> entry in controllers)
+    foreach (KeyValuePair <VersatileControllerVirtual, ControllerState> entry in controllers)
     {
-      FlexibleControllerVirtual ctl = entry.Key;
+      VersatileControllerVirtual ctl = entry.Key;
       
       if (ctl != null) // in case controller has been destroyed
       {
@@ -147,7 +147,7 @@ public class BalloonPop : MonoBehaviour
     }
     
     // Remove any failed controllers.
-    foreach (FlexibleControllerVirtual ctl in failedControllers)
+    foreach (VersatileControllerVirtual ctl in failedControllers)
     {
       controllers.Remove (ctl);
     }

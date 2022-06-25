@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using TMPro;
 using Photon.Pun;
 
-public class FlexibleControllerVirtual : MonoBehaviour
+public class VersatileControllerVirtual : MonoBehaviour
 {
   public TextMeshProUGUI debug;
 
@@ -65,37 +65,37 @@ public class FlexibleControllerVirtual : MonoBehaviour
   {
     if (!classInitialized)
     {
-      buttonDownEvents = new Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> ();
-      buttonUpEvents = new Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> ();
+      buttonDownEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
+      buttonUpEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
       classInitialized = true;
     }
   }
   
-  private Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> buttonDownEvents;
-  private Dictionary <string, UnityEvent <string, FlexibleControllerVirtual>> buttonUpEvents;
+  private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonDownEvents;
+  private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
   private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
 
   // Use this to receive call backs whenever the named button is pressed. 
   // The callback provides the name of the button, so that the callback
   // can be used to subscribe to multiple buttons.
-  public void subscribeButtonDown (string button, UnityAction <string, FlexibleControllerVirtual> call)
+  public void subscribeButtonDown (string button, UnityAction <string, VersatileControllerVirtual> call)
   {
     classInitialize ();
     if (!buttonDownEvents.ContainsKey (button))
     {
-      buttonDownEvents[button] = new UnityEvent <string, FlexibleControllerVirtual> ();
+      buttonDownEvents[button] = new UnityEvent <string, VersatileControllerVirtual> ();
     }
     buttonDownEvents[button].AddListener (call);
   }
   
   // Use this to receive call backs whenever the named button is released.
-  public void subscribeButtonUp (string button, UnityAction <string, FlexibleControllerVirtual> call)
+  public void subscribeButtonUp (string button, UnityAction <string, VersatileControllerVirtual> call)
   {
     classInitialize ();
     if (!buttonUpEvents.ContainsKey (button))
     {
-      buttonUpEvents[button] = new UnityEvent <string, FlexibleControllerVirtual> ();
+      buttonUpEvents[button] = new UnityEvent <string, VersatileControllerVirtual> ();
     }
     buttonUpEvents[button].AddListener (call);
   }
