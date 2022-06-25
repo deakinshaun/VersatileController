@@ -27,6 +27,22 @@ If you miss this step, the key can be set in Assets/Photon/PhotonUnityNetworking
 
 6. You should now be able to run your Unity project, start the application on your phone and see the virtual version of the controller manipulated by the physical device.
 
+Using the Controller in your own application
+============================================
+
+The sample BalloonPop component demonstrates how to utilize the controller in your application. Specifically:
+
+- All functions that you should need to use are available via the VersatileControllerVirtual class.
+- You can register a callback to be notified of new controllers joining your application using the subscribeNewControllers method. This is a static
+method so does not need an instance of the class.
+- When a new controller connects, this will provide a GameObject containing a VersatileControllerVirtual component.
+- You can subscribe to button events (Down and Up), and pose events using this component. 
+- The button callbacks provide the name of the button, and identify the controller object that produced the event. The state of the button is implicit
+in the callback (whether it is the down or up callback event).
+- The pose callback provides the orientation and position of the controller. For 3 DoF controllers, the position is always zero.
+- Controllers that disconnect will have their VersatileControllerVirtual (and GameObject) become null. Do check for this before attempting to 
+access the controller.
+
 Using the Controller with your own license key
 ==============================================
 
