@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using Photon.Pun;
 
-public class FlexibleController : MonoBehaviourPun
+public class FlexibleControllerPhysical : MonoBehaviourPun
 {
     public TextMeshProUGUI debug;
     
@@ -14,11 +14,15 @@ public class FlexibleController : MonoBehaviourPun
     public TextMeshProUGUI systemID;
     public TextMeshProUGUI controllerID;
     
-//     // Returns true if the provided strings match the settings for this controller.
-//     private bool validateSource (string sID, string cID)
-//     {
-//       return true;
-//     }
+    private Quaternion restOrientation = Quaternion.identity;
+    private Vector3 restPosition = Vector3.zero;
+
+    // Set current pose as the "zero" state.
+    public void recenter ()
+    {
+      restOrientation = getOrientation ();
+      restPosition = getPosition ();
+    }
     
     public void sendButtonDown (string button)
     {
@@ -31,18 +35,34 @@ public class FlexibleController : MonoBehaviourPun
 
     // Just stubs, since physical controllers don't need to process these.
     [PunRPC]
+    public void ControllerStarted (string name) {}
+    [PunRPC]
     public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info) {}
     [PunRPC]
     public void SendButtonUp (string button, PhotonMessageInfo info) {}
     [PunRPC]
     void SendControlInfo (float x, float y, float z, float w, PhotonMessageInfo info) {}
     
-    // 
-    
     private void Start()
     {
         Input.gyro.enabled = true;
+        
+        if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+        {
+          GetComponent<PhotonView>().RPC ("ControllerStarted", RpcTarget.All, controllerID.text);
+        }
     }
+    
+    private Quaternion getOrientation ()
+    {
+      return Quaternion.Euler (90, 0, 90) * Input.gyro.attitude * Quaternion.Euler (180, 180, 0);
+    }
+    
+    private Vector3 getPosition ()
+    {
+      return Vector3.zero;
+    }
+    
     void Update()   
     {
       if (SystemInfo.supportsGyroscope)
@@ -52,7 +72,7 @@ public class FlexibleController : MonoBehaviourPun
         {
 
           // Convert android to unity coordinates.
-          Quaternion orientation = Quaternion.Euler (90, 0, 90) * Input.gyro.attitude * Quaternion.Euler (180, 180, 0);
+          Quaternion orientation = getOrientation () * Quaternion.Inverse (restOrientation);
       //    debug.text = orientation.ToString ("F5");
 
           GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
@@ -61,11 +81,4 @@ public class FlexibleController : MonoBehaviourPun
       }
     }
 
-//     [PunRPC]
-//     void SendControlInfo (float x, float y, float z, float w, PhotonMessageInfo info)
-//     {
-//         Quaternion o = new Quaternion(x, y, z, w);
-//         Debug.Log("Got controller info: " + o.ToString ("F5") + " " + info.Sender.ToString ());
-//         transform.rotation = o;
-//     }
 }
