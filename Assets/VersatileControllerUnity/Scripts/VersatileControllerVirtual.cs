@@ -52,7 +52,6 @@ public class VersatileControllerVirtual : MonoBehaviour
       // A new controller has been started. Unlikely to get duplicates, but checking anyway.
       knownControllers.Add (this.gameObject);
       controllerObjects[this.gameObject] = name;
-      Debug.Log ("Controller started: " + name + " " + this.gameObject.name);
       newControllers.Invoke (this.gameObject);
     }
   }
@@ -108,7 +107,6 @@ public class VersatileControllerVirtual : MonoBehaviour
     {
       buttonDownEvents[button].Invoke (button, this);
     }
-    Debug.Log("Got button down: " + button + " " + info.Sender.ToString () + " " + systemID + " " + controllerID);
   }
   [PunRPC]
   public void SendButtonUp (string button, PhotonMessageInfo info)
@@ -118,7 +116,6 @@ public class VersatileControllerVirtual : MonoBehaviour
     {
       buttonUpEvents[button].Invoke (button, this);
     }
-    Debug.Log("Got button up: " + button + " " + info.Sender.ToString ());
   }
   
   // Event tracking for pose updates
@@ -129,13 +126,6 @@ public class VersatileControllerVirtual : MonoBehaviour
     poseEvents.AddListener (call);
   }
 
-//   // Returns true if the provided strings match the settings for this controller.
-//   private bool validateSource (string sID, string cID)
-//   {
-//     return true;
-//   }
-  
-  
   [PunRPC]
   void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz, PhotonMessageInfo info)
   {
@@ -143,7 +133,6 @@ public class VersatileControllerVirtual : MonoBehaviour
     
     Quaternion o = new Quaternion(x, y, z, w);
     Vector3 p = new Vector3 (px, py, pz);
-    //         Debug.Log("Got controller info: " + o.ToString ("F5") + " " + info.Sender.ToString ());
     
     poseEvents.Invoke (this.gameObject, o, p);
     

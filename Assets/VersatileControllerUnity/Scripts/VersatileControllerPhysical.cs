@@ -26,11 +26,17 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   
   public void sendButtonDown (string button)
   {
-    GetComponent<PhotonView>().RPC ("SendButtonDown", RpcTarget.All, button, systemID.text, controllerID.text);
+    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+    {
+      GetComponent<PhotonView>().RPC ("SendButtonDown", RpcTarget.All, button, systemID.text, controllerID.text);
+    }
   }
   public void sendButtonUp (string button)
   {
-    GetComponent<PhotonView>().RPC ("SendButtonUp", RpcTarget.All, button);
+    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+    {
+      GetComponent<PhotonView>().RPC ("SendButtonUp", RpcTarget.All, button);
+    }
   }
   
   // Just stubs, since physical controllers don't need to process these.
@@ -47,27 +53,32 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   private float announcementLimit = 2.0f; // The time delay between new announcements of this controller.
   private void announceController ()
   {
-    announcementTimer += Time.deltaTime;
-    
-    if (announcementTimer > announcementLimit)
+    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
     {
-      if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+      announcementTimer += Time.deltaTime;
+      
+      if (announcementTimer > announcementLimit)
       {
         GetComponent<PhotonView>().RPC ("ControllerStarted", RpcTarget.All, controllerID.text);
+        announcementTimer = 0.0f;
       }
-      announcementTimer = 0.0f;
     }
   }
   
   private void Start()
   {
-    Input.gyro.enabled = true;
-    announceController ();
+    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+    {
+      // Controls must only be enabled for the active controller - otherwise the imposter for another controller
+      // will take over this device.
+      defaultControls.gameObject.SetActive (true);
+      Input.gyro.enabled = true;
+      announceController ();
+    }
   }
   
   private Quaternion getOrientation ()
   {
-//     return Quaternion.Euler (90, 0, 90) * Input.gyro.attitude * Quaternion.Euler (180, 180, 0);
     Quaternion q = Input.gyro.attitude;
     return new Quaternion (-q.x, -q.z, -q.y, q.w);
   }
@@ -82,7 +93,6 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     announceController ();
     if (SystemInfo.supportsGyroscope)
     {
-//       Debug.Log ("Gyro active, " + photonView.IsMine + " " + PhotonNetwork.IsConnected);
       if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
       {
         
@@ -96,6 +106,5 @@ public class VersatileControllerPhysical : MonoBehaviourPun
                                        position.x, position.y, position.z);
       }
     }
-  }
-  
+  }  
 }
