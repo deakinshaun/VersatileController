@@ -45,6 +45,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   public void ControllerStarted (string name)
   {
     initialize ();
+    classInitialize ();
     
     this.gameObject.name = name;
     if (!knownControllers.Contains (this.gameObject))
@@ -54,6 +55,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       controllerObjects[this.gameObject] = name;
       newControllers.Invoke (this.gameObject);
     }
+    nameUpdates.Invoke (name);
   }
   
   // Event tracking for button presses.
@@ -67,6 +69,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       buttonDownEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       buttonUpEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
+      nameUpdates = new UnityEvent<string> ();
       classInitialized = true;
     }
   }
@@ -74,7 +77,14 @@ public class VersatileControllerVirtual : MonoBehaviour
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonDownEvents;
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
   private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
+  private UnityEvent<string> nameUpdates;
 
+  public void subscribeNameUpdates (UnityAction <string> call)
+  {
+    classInitialize ();
+    nameUpdates.AddListener (call);
+  }
+  
   // Use this to receive call backs whenever the named button is pressed. 
   // The callback provides the name of the button, so that the callback
   // can be used to subscribe to multiple buttons.

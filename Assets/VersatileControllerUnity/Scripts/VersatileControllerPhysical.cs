@@ -6,16 +6,27 @@ using Photon.Pun;
 
 public class VersatileControllerPhysical : MonoBehaviourPun
 {
-  public TextMeshProUGUI debug;
-  
   [Header ("Default Controller Widgets")]
   [Tooltip ("Canvas for this set of widgets, so they can be switched on and off as a group")]
   public Canvas defaultControls;
-  public TextMeshProUGUI systemID;
-  public TextMeshProUGUI controllerID;
+  public TMP_InputField systemID;
+  public TMP_InputField controllerID;
+  [Tooltip ("Status display")]
+  public TextMeshProUGUI statusText;
   
   private Quaternion restOrientation = Quaternion.identity;
   private Vector3 restPosition = Vector3.zero;
+  
+  private PhotonManagerPhysical photonManager;
+  
+  // Called to initialize controller interface, with details of the system and 
+  // controller IDs used.
+  public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid)
+  {
+    photonManager = pm;
+    systemID.text = sid;
+    controllerID.text = cid;
+  }
   
   // Set current pose as the "zero" state.
   public void recenter ()
@@ -65,6 +76,25 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     }
   }
   
+  // One of the system/controller IDs have changed. Reconnect.
+  public void changeConnection (string value)
+  {
+    photonManager.updateConnectionDetails (systemID.text, controllerID.text);
+    photonManager.reconnect ();
+  }
+  
+  private void reportStatus ()
+  {
+    if (PhotonNetwork.IsConnected)
+    {
+      statusText.text = "Connected to region: " + PhotonNetwork.CloudRegion;
+    }
+    else
+    {
+      statusText.text = "Disconnected";
+    }
+  }
+  
   private void Start()
   {
     if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
@@ -74,6 +104,8 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       defaultControls.gameObject.SetActive (true);
       Input.gyro.enabled = true;
       announceController ();
+      
+      reportStatus ();
     }
   }
   
@@ -99,7 +131,6 @@ public class VersatileControllerPhysical : MonoBehaviourPun
         // Convert android to unity coordinates.
         Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
         Vector3 position = getPosition () - restPosition;
-        //    debug.text = orientation.ToString ("F5");
         
         GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
                                        orientation.x, orientation.y, orientation.z, orientation.w,

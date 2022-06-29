@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ButtonPreview : MonoBehaviour
 {
+  [Tooltip ("Label, to use to name the controller")]
+  public TextMeshPro controllerName;
+  
   [Tooltip ("Colour to use to indicate light is off")]
   public Material lightOff;
   [Tooltip ("Colour to use to indicate light is on")]
@@ -21,11 +25,17 @@ public class ButtonPreview : MonoBehaviour
   // Register to receive button press events.
   void Start()
   {
+    GetComponent <VersatileControllerVirtual> ().subscribeNameUpdates (updateName);
     foreach (Indicators i in indicators)
     {
       GetComponent <VersatileControllerVirtual> ().subscribeButtonDown (i.indicatorName, switchLightOn);
       GetComponent <VersatileControllerVirtual> ().subscribeButtonUp (i.indicatorName, switchLightOff);
     }
+  }
+  
+  private void updateName (string n)
+  {
+    controllerName.text = n;
   }
   
   // Set the light to the given colour (material)
