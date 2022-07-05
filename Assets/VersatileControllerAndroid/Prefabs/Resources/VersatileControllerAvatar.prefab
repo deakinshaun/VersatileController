@@ -2869,6 +2869,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94db0595cd741284d89d2dc3b5cf92de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useAR: 1
+  ARTrackableName: ARTracking/AR Session Origin/AR Camera
   defaultControls: {fileID: 6299565176383924297}
   systemID: {fileID: 8650426269432882704}
   controllerID: {fileID: 6784072218324380812}

@@ -6,6 +6,10 @@ using Photon.Pun;
 
 public class VersatileControllerPhysical : MonoBehaviourPun
 {
+  [Tooltip ("Use ARCore on supported devices for orientation and position tracking")]
+  public bool useAR = false;
+  public string ARTrackableName;
+  
   [Header ("Default Controller Widgets")]
   [Tooltip ("Canvas for this set of widgets, so they can be switched on and off as a group")]
   public Canvas defaultControls;
@@ -18,6 +22,8 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   private Vector3 restPosition = Vector3.zero;
   
   private PhotonManagerPhysical photonManager;
+
+  private GameObject ARTrackable;
   
   // Called to initialize controller interface, with details of the system and 
   // controller IDs used.
@@ -105,36 +111,70 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       Input.gyro.enabled = true;
       announceController ();
       
+      if (useAR)
+      {
+        ARTrackable = GameObject.Find (ARTrackableName);
+      }
+      
       reportStatus ();
     }
   }
   
   private Quaternion getOrientation ()
   {
-    Quaternion q = Input.gyro.attitude;
-    return new Quaternion (-q.x, -q.z, -q.y, q.w);
+    if (useAR && (ARTrackable != null))
+    {
+      Quaternion q = ARTrackable.transform.rotation * Quaternion.AngleAxis (-90, Vector3.right);
+      return new Quaternion (q.x, q.y, q.z, q.w);
+    }
+    else
+    {
+      Quaternion q = Input.gyro.attitude;
+      return new Quaternion (-q.x, -q.z, -q.y, q.w);
+    }
   }
   
   private Vector3 getPosition ()
   {
-    return Vector3.zero;
+    if (useAR && (ARTrackable != null))
+    {
+      Vector3 p = ARTrackable.transform.position;
+      return new Vector3 (p.x, p.y, p.z);
+    }
+    else
+    {
+      return Vector3.zero;
+    }
   }
   
   void Update()   
   {
     announceController ();
-    if (SystemInfo.supportsGyroscope)
+    if (useAR && (ARTrackable != null))
     {
-      if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+      statusText.text = ARTrackable.transform.position.ToString ("F5") + " " + ARTrackable.transform.rotation.ToString ("F5");
+      Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
+      Vector3 position = getPosition () - restPosition;
+      
+      GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
+                                    orientation.x, orientation.y, orientation.z, orientation.w,
+                                    position.x, position.y, position.z);
+    }
+    else
+    {
+      if (SystemInfo.supportsGyroscope)
       {
-        
-        // Convert android to unity coordinates.
-        Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
-        Vector3 position = getPosition () - restPosition;
-        
-        GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
-                                       orientation.x, orientation.y, orientation.z, orientation.w,
-                                       position.x, position.y, position.z);
+        if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+        {
+          
+          // Convert android to unity coordinates.
+          Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
+          Vector3 position = getPosition () - restPosition;
+          
+          GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
+                                        orientation.x, orientation.y, orientation.z, orientation.w,
+                                        position.x, position.y, position.z);
+        }
       }
     }
   }  
