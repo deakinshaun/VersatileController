@@ -48,6 +48,19 @@ Using the Controller with your own license key
 
 The android application needs to be rebuilt if you use a different key. This key needs to be the same in the android application, and in the Unity project that the controller connects to.
 
+Building the controller application
+===================================
+
+The project is set to build the controller application (as an apk) directly.
+
+Use File/Build And Run to start this.
+
+By default, the project builds the version that uses ARCore and ARFoundation to provide rotational and positional tracking (a 6 DoF controller).
+
+If your device does not support this, you can still use the 3 DoF rotational tracking. Changes required include:
+- Disable ARCore under the project settings (XR Plug-in Management).
+- Edit the VersatileControllerPrefab under the VersatileControllerAndroid/Prefabs/Resources folder in the Assets. Disable the UseAR checkbox.
+
 Acknowledgements
 ================
 
