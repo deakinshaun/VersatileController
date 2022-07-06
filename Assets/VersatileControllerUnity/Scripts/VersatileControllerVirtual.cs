@@ -42,7 +42,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   }
   
   [PunRPC]
-  public void ControllerStarted (string name)
+  public void ControllerStarted (string name, bool isLeftHanded, string skinName)
   {
     initialize ();
     classInitialize ();
@@ -55,7 +55,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       controllerObjects[this.gameObject] = name;
       newControllers.Invoke (this.gameObject);
     }
-    nameUpdates.Invoke (name);
+    nameUpdates.Invoke (name, isLeftHanded, skinName);
   }
   
   // Event tracking for button presses.
@@ -69,7 +69,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       buttonDownEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       buttonUpEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
-      nameUpdates = new UnityEvent<string> ();
+      nameUpdates = new UnityEvent<string, bool, string> ();
       classInitialized = true;
     }
   }
@@ -77,9 +77,9 @@ public class VersatileControllerVirtual : MonoBehaviour
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonDownEvents;
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
   private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
-  private UnityEvent<string> nameUpdates;
+  private UnityEvent<string, bool, string> nameUpdates;
 
-  public void subscribeNameUpdates (UnityAction <string> call)
+  public void subscribeNameUpdates (UnityAction <string, bool, string> call)
   {
     classInitialize ();
     nameUpdates.AddListener (call);

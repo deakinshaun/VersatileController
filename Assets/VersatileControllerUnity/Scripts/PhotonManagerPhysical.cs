@@ -20,13 +20,19 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
   private string systemID = "General";
   [Tooltip ("The controller ID for this specific controllers. Use this to distinguish between different controllers in the same application (e.g. LeftHand and RighHand)")]
   private string controllerID = "DefaultController";
+  [Tooltip ("Handedness - is the controller intended for left or right handed use.")]
+  private bool isLeftHanded = true;
+  [Tooltip ("Skin - the name of the skin applied to this controller.")]
+  public string skinName = "Controller Emulation";
   
   // Define the system and controller IDs. These are stored persistently, so
   // are reused when the controller next reconnects.
-  public void updateConnectionDetails (string sid, string cid)
+  public void updateConnectionDetails (string sid, string cid, bool left, string skin)
   {
     systemID = sid;
     controllerID = cid;
+    isLeftHanded = left;
+    skinName = skin;
     persist ();
   }
   
@@ -34,7 +40,8 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
   private void persist ()
   {
     string persistFilename = Application.persistentDataPath + "/" + "persist.txt";
-    string [] data = { systemID, controllerID };
+    string [] data = { systemID, controllerID, isLeftHanded.ToString (), skinName };
+    Debug.Log ("Persisting " + data[3]);
     File.WriteAllLines(persistFilename, data, Encoding.UTF8);
   }
   
@@ -45,12 +52,14 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
     {
       string persistFilename = Application.persistentDataPath + "/" + "persist.txt";
       string [] lines = System.IO.File.ReadAllLines (persistFilename);
-      if (lines.Length >= 2)
+      if (lines.Length >= 4)
       {
         systemID = lines[0];
         controllerID = lines[1];
+        isLeftHanded = lines[2].Equals ("True");
+        skinName = lines[3];
       }
-      Debug.Log ("Got lines : " + lines + " " + lines[0] + " " + lines[1]);
+      Debug.Log ("Got lines : " + lines + " " + lines[0] + " " + lines[1] + " " + lines[2] + " " + lines[3]);
     }
     catch (Exception)
     {
@@ -103,7 +112,7 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
     PhotonNetwork.CurrentRoom.PlayerCount + " particpants");
     
     GameObject avatar = PhotonNetwork.Instantiate(avatarPrefab.name, new Vector3(), Quaternion.identity, 0);
-    avatar.GetComponent <VersatileControllerPhysical> ().setPhotonManager (this, systemID, controllerID);
+    avatar.GetComponent <VersatileControllerPhysical> ().setPhotonManager (this, systemID, controllerID, isLeftHanded, skinName);
   }
   
   void OnApplicationPause(bool pauseStatus)

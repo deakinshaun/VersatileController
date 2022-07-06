@@ -1,11 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 
 public class VersatileControllerPhysical : MonoBehaviourPun
 {
+  [System.Serializable]
+  public class Skins
+  {
+    public string name;
+    public GameObject [] panels;
+  }
+  
   [Tooltip ("Use ARCore on supported devices for orientation and position tracking")]
   public bool useAR = false;
   public string ARTrackableName;
@@ -17,6 +25,11 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   public TMP_InputField controllerID;
   [Tooltip ("Status display")]
   public TextMeshProUGUI statusText;
+  public Toggle leftHandToggle;
+  public TMP_Dropdown skinSelection;
+  
+  [SerializeField]
+  public Skins [] skins;
   
   private Quaternion restOrientation = Quaternion.identity;
   private Vector3 restPosition = Vector3.zero;
@@ -25,13 +38,32 @@ public class VersatileControllerPhysical : MonoBehaviourPun
 
   private GameObject ARTrackable;
   
+  // Used to indicate when this script is directly setting a field in a UI element. Stops
+  // event handlers from responding.
+  private bool directlySetting = false;
+  private bool setSkins = false;
+  
   // Called to initialize controller interface, with details of the system and 
   // controller IDs used.
-  public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid)
+  public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid, bool left, string skin)
   {
+    addSkins ();
+    
+    directlySetting = true;
     photonManager = pm;
     systemID.text = sid;
     controllerID.text = cid;
+    leftHandToggle.isOn = left;
+
+    int option = skinSelection.options.FindIndex(option => option.text == skin);
+    if (option < 0)
+    {
+      option = 0;
+    }
+    skinSelection.SetValueWithoutNotify (option);
+    skinSelection.RefreshShownValue ();
+    
+    directlySetting = false;
   }
   
   // Set current pose as the "zero" state.
@@ -58,7 +90,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   
   // Just stubs, since physical controllers don't need to process these.
   [PunRPC]
-  public void ControllerStarted (string name) {}
+  public void ControllerStarted (string name, bool isLeftHanded, string skinName) {}
   [PunRPC]
   public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info) {}
   [PunRPC]
@@ -76,7 +108,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       
       if (announcementTimer > announcementLimit)
       {
-        GetComponent<PhotonView>().RPC ("ControllerStarted", RpcTarget.All, controllerID.text);
+        GetComponent<PhotonView>().RPC ("ControllerStarted", RpcTarget.All, controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
         announcementTimer = 0.0f;
       }
     }
@@ -85,8 +117,14 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   // One of the system/controller IDs have changed. Reconnect.
   public void changeConnection (string value)
   {
-    photonManager.updateConnectionDetails (systemID.text, controllerID.text);
-    photonManager.reconnect ();
+    if (!directlySetting)
+    {
+      if (photonManager != null)
+      {
+        photonManager.updateConnectionDetails (systemID.text, controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
+        photonManager.reconnect ();
+      }
+    }
   }
   
   private void reportStatus ()
@@ -98,6 +136,22 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     else
     {
       statusText.text = "Disconnected";
+    }
+  }
+  
+  private void addSkins ()
+  {
+    if (!setSkins)
+    {
+      List <string> options = new List <string> ();
+      foreach (Skins s in skins)
+      {
+        options.Add (s.name);
+      }
+      skinSelection.ClearOptions ();
+      skinSelection.AddOptions (options);
+        
+      setSkins = true;
     }
   }
   
@@ -115,6 +169,8 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       {
         ARTrackable = GameObject.Find (ARTrackableName);
       }
+      
+      addSkins ();
       
       reportStatus ();
     }
@@ -152,7 +208,6 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     announceController ();
     if (useAR && (ARTrackable != null))
     {
-      statusText.text = ARTrackable.transform.position.ToString ("F5") + " " + ARTrackable.transform.rotation.ToString ("F5");
       Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
       Vector3 position = getPosition () - restPosition;
       

@@ -33,7 +33,7 @@ public class ButtonPreview : MonoBehaviour
     }
   }
   
-  private void updateName (string n)
+  private void updateName (string n, bool isLeftHanded, string skinName)
   {
     controllerName.text = n;
   }
