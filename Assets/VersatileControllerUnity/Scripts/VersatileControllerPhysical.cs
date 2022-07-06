@@ -48,7 +48,6 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid, bool left, string skin)
   {
     addSkins ();
-    
     directlySetting = true;
     photonManager = pm;
     systemID.text = sid;
@@ -64,6 +63,8 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     skinSelection.RefreshShownValue ();
     
     directlySetting = false;
+    
+    panelVisibility ();
   }
   
   // Set current pose as the "zero" state.
@@ -84,7 +85,14 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   {
     if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
     {
-      GetComponent<PhotonView>().RPC ("SendButtonUp", RpcTarget.All, button);
+      GetComponent<PhotonView>().RPC ("SendButtonUp", RpcTarget.All, button, systemID.text, controllerID.text);
+    }
+  }
+  public void sendSliderChanged (string slider, float value)
+  {
+    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+    {
+      GetComponent<PhotonView>().RPC ("SendSliderChanged", RpcTarget.All, slider, value, systemID.text, controllerID.text);
     }
   }
   
@@ -94,7 +102,9 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   [PunRPC]
   public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info) {}
   [PunRPC]
-  public void SendButtonUp (string button, PhotonMessageInfo info) {}
+  public void SendButtonUp (string button, string systemID, string controllerID, PhotonMessageInfo info) {}
+  [PunRPC]
+  public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info) {}
   [PunRPC]
   void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz, PhotonMessageInfo info) {}
   
@@ -137,6 +147,35 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     {
       statusText.text = "Disconnected";
     }
+  }
+  
+  // Set the visibility of the various panels, based on the current skin.
+  // The prefab should have all panels disabled by default. This will try
+  // to switch off any named panels, but any unused ones will be left alone.
+  private void panelVisibility ()
+  {
+    // Switch everything off.
+    foreach (Skins s in skins)
+    {
+      Debug.Log ("Disable: " + s.name);
+      foreach (GameObject g in s.panels)
+      {
+        g.SetActive (false);
+      }
+    }
+
+    // Switch the active skin on.
+    foreach (Skins s in skins)
+    {
+      if (s.name == skinSelection.options[skinSelection.value].text)
+      {
+        Debug.Log ("Enable: " + s.name);
+        foreach (GameObject g in s.panels)
+        {
+          g.SetActive (true);
+        }
+      }
+    }    
   }
   
   private void addSkins ()

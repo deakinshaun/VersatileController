@@ -119,13 +119,18 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   [PunRPC]
-  public void SendButtonUp (string button, PhotonMessageInfo info)
+  public void SendButtonUp (string button, string systemID, string controllerID, PhotonMessageInfo info)
   {
     classInitialize ();
     if (buttonUpEvents.ContainsKey (button))
     {
       buttonUpEvents[button].Invoke (button, this);
     }
+  }
+  [PunRPC]
+  public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info)
+  {
+    Debug.Log ("Slider: " + slider + " " + value);
   }
   
   // Event tracking for pose updates
