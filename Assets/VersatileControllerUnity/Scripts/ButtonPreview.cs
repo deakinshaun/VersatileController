@@ -22,14 +22,16 @@ public class ButtonPreview : MonoBehaviour
   
   public Indicators [] indicators;
   
+  public VersatileControllerVirtual controller;
+  
   // Register to receive button press events.
   void Start()
   {
-    GetComponent <VersatileControllerVirtual> ().subscribeNameUpdates (updateName);
+    controller.subscribeNameUpdates (updateName);
     foreach (Indicators i in indicators)
     {
-      GetComponent <VersatileControllerVirtual> ().subscribeButtonDown (i.indicatorName, switchLightOn);
-      GetComponent <VersatileControllerVirtual> ().subscribeButtonUp (i.indicatorName, switchLightOff);
+      controller.subscribeButtonDown (i.indicatorName, switchLightOn);
+      controller.subscribeButtonUp (i.indicatorName, switchLightOff);
     }
   }
   

@@ -7,10 +7,19 @@ using Photon.Pun;
 
 public class VersatileControllerVirtual : MonoBehaviour
 {
+  [System.Serializable]
+  public class Skins
+  {
+    public string name;
+    public GameObject [] parts;
+  }
+  
   public TextMeshProUGUI debug;
 
   [Tooltip ("Disable this if you want to manually set the position and rotation, using the control input. Otherwise the object this component is attached to will be driven directly by this component")]
   public bool setPose = true;
+  
+  public Skins [] skins;
   
   // Event for tracking when new controllers are added.
   private static UnityEvent<GameObject> newControllers;
@@ -41,11 +50,37 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  private void setSkin (string skinName)
+  {
+    // Switch off all skins
+    foreach (Skins s in skins)
+    {
+      foreach (GameObject g in s.parts)
+      {
+        g.SetActive (false);
+      }
+    }
+    
+    // Enable the active skin.
+    foreach (Skins s in skins)
+    {
+      if (s.name == skinName)
+      {
+        foreach (GameObject g in s.parts)
+        {
+          g.SetActive (true);
+        }
+      }
+    }
+  }
+  
   [PunRPC]
   public void ControllerStarted (string name, bool isLeftHanded, string skinName)
   {
     initialize ();
     classInitialize ();
+    
+    setSkin (skinName);
     
     this.gameObject.name = name;
     if (!knownControllers.Contains (this.gameObject))
@@ -68,6 +103,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     {
       buttonDownEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       buttonUpEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
+      sliderEvents = new Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> ();
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
       nameUpdates = new UnityEvent<string, bool, string> ();
       classInitialized = true;
@@ -76,6 +112,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonDownEvents;
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
+  private Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> sliderEvents;
   private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
   private UnityEvent<string, bool, string> nameUpdates;
 
@@ -109,6 +146,16 @@ public class VersatileControllerVirtual : MonoBehaviour
     buttonUpEvents[button].AddListener (call);
   }
   
+  public void subscribeSlider (string slider, UnityAction <string, float, VersatileControllerVirtual> call)
+  {
+    classInitialize ();
+    if (!sliderEvents.ContainsKey (slider))
+    {
+      sliderEvents[slider] = new UnityEvent <string, float, VersatileControllerVirtual> ();
+    }
+    sliderEvents[slider].AddListener (call);
+  }
+  
   [PunRPC]
   public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info)
   {
@@ -118,6 +165,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       buttonDownEvents[button].Invoke (button, this);
     }
   }
+  
   [PunRPC]
   public void SendButtonUp (string button, string systemID, string controllerID, PhotonMessageInfo info)
   {
@@ -131,6 +179,11 @@ public class VersatileControllerVirtual : MonoBehaviour
   public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info)
   {
     Debug.Log ("Slider: " + slider + " " + value);
+    classInitialize ();
+    if (sliderEvents.ContainsKey (slider))
+    {
+      sliderEvents[slider].Invoke (slider, value, this);
+    }
   }
   
   // Event tracking for pose updates

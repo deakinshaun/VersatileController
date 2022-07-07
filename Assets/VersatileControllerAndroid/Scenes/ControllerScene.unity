@@ -393,6 +393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatarPrefab: {fileID: 7247905527506269142, guid: 809915f0762a14d4183a367af26509f8, type: 3}
+  skinName: Controller Emulation
 --- !u!4 &559933094
 Transform:
   m_ObjectHideFlags: 0
