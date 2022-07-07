@@ -60,6 +60,11 @@ crashlytics-build.properties
 
 .vsconfig
 Photon.meta
-Photon/
+Assets/Photon/*
+!Assets/Photon/PhotonUnityNetworking
+Assets/Photon/PhotonUnityNetworking/*
+!Assets/Photon/PhotonUnityNetworking/Resources
+Assets/Photon/PhotonUnityNetworking/Resources/*
+!Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
 TextMesh Pro.meta
 TextMesh Pro/
