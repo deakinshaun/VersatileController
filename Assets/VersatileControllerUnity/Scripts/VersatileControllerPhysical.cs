@@ -7,10 +7,18 @@ using Photon.Pun;
 
 public class VersatileControllerPhysical : MonoBehaviourPun
 {
+  public enum Handedness
+  {
+    LeftHanded,
+    RightHanded,
+    BothHands
+  }
+  
   [System.Serializable]
   public class Skins
   {
     public string name;
+    public Handedness whichHand;
     public GameObject [] panels;
   }
   
@@ -26,6 +34,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   [Tooltip ("Status display")]
   public TextMeshProUGUI statusText;
   public Toggle leftHandToggle;
+  public Toggle rightHandToggle;
   public TMP_Dropdown skinSelection;
   
   [SerializeField]
@@ -53,6 +62,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     systemID.text = sid;
     controllerID.text = cid;
     leftHandToggle.isOn = left;
+    rightHandToggle.isOn = !left;
 
     int option = skinSelection.options.FindIndex(option => option.text == skin);
     if (option < 0)
@@ -62,9 +72,9 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     skinSelection.SetValueWithoutNotify (option);
     skinSelection.RefreshShownValue ();
     
-    directlySetting = false;
-    
     panelVisibility ();
+
+    directlySetting = false;    
   }
   
   // Set current pose as the "zero" state.
@@ -167,7 +177,8 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     // Switch the active skin on.
     foreach (Skins s in skins)
     {
-      if (s.name == skinSelection.options[skinSelection.value].text)
+      if ((s.name == skinSelection.options[skinSelection.value].text) && 
+          ((s.whichHand == Handedness.BothHands) || ((s.whichHand == Handedness.LeftHanded) == leftHandToggle.isOn)))
       {
         Debug.Log ("Enable: " + s.name);
         foreach (GameObject g in s.panels)
@@ -185,7 +196,10 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       List <string> options = new List <string> ();
       foreach (Skins s in skins)
       {
-        options.Add (s.name);
+        if (!(options.Contains (s.name)))
+        {
+          options.Add (s.name);
+        }
       }
       skinSelection.ClearOptions ();
       skinSelection.AddOptions (options);

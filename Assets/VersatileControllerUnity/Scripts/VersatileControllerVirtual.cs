@@ -11,6 +11,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   public class Skins
   {
     public string name;
+    public VersatileControllerPhysical.Handedness whichHand;
     public GameObject [] parts;
   }
   
@@ -50,7 +51,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
-  private void setSkin (string skinName)
+  private void setSkin (string skinName, bool isLeftHanded)
   {
     // Switch off all skins
     foreach (Skins s in skins)
@@ -64,7 +65,9 @@ public class VersatileControllerVirtual : MonoBehaviour
     // Enable the active skin.
     foreach (Skins s in skins)
     {
-      if (s.name == skinName)
+      if ((s.name == skinName) && 
+          ((s.whichHand == VersatileControllerPhysical.Handedness.BothHands) || 
+          ((s.whichHand == VersatileControllerPhysical.Handedness.LeftHanded) == isLeftHanded)))
       {
         foreach (GameObject g in s.parts)
         {
@@ -80,7 +83,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     initialize ();
     classInitialize ();
     
-    setSkin (skinName);
+    setSkin (skinName, isLeftHanded);
     
     this.gameObject.name = name;
     if (!knownControllers.Contains (this.gameObject))

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 /// This class is a mechanism to translate the onValueChanged events
 /// produced by the slider class, into named events - so the same
@@ -13,9 +14,27 @@ using UnityEngine.Events;
 /// field), and a float representing the current slider value.
 public class SliderChanged : MonoBehaviour
 {
+  public Slider slider;
   public string sliderName;
   public UnityEvent<string, float> namedOnValueChanged;
     
+  private float timeCount = 0.0f; // used to track time elapsed between updates.
+  private float timeUpdate = 1.0f; // time between updates.
+  
+  public void Update ()
+  {
+    timeCount += Time.deltaTime;
+    if (timeCount > timeUpdate)
+    {
+      // Send regular update, so virtual controller mirrors current values.
+      if (slider != null)
+      {
+        onValueChanged (slider.value);
+      }
+      timeCount -= timeUpdate;
+    }
+  }
+  
   public void onValueChanged (float value)
   {
     namedOnValueChanged.Invoke (sliderName, value);
