@@ -12,7 +12,7 @@ Basic Installation Instructions
 
 These instructions assume you are using the versatilecontroller.apk which is part of the repository. This needs to be installed on the android phone you are using.
 
-This phone needs to be equipped with a gyroscope (most models are, but some do not, so check the phone specifications if there is an issues tracking rotation of the controller). The phone also needs to be connected to the Internet, as does the application running on Unity (via the editor, or via a build).
+This phone needs to be equipped with a gyroscope (most models are, but some do not, so check the phone specifications if there is an issues tracking rotation of the controller). The phone also needs to be connected to the Internet, as does the application running on Unity (via the editor, or via a build). The version of the controller apk that is supplied uses ARCore for tracking both position and orientation. Your device needs to be able to support this. If your device doesn't support ARCore but has a gyroscope then you can build a version of the android application that tracks only orientation (see the instructions below).
 
 1. Open Unity with the project you want to add the controller to.
 
@@ -43,6 +43,8 @@ in the callback (whether it is the down or up callback event).
 - Controllers that disconnect will have their VersatileControllerVirtual (and GameObject) become null. Do check for this before attempting to 
 access the controller.
 
+The TemplateScene and the ControllerTemplate.cs provide a minimalistic scene and code component that is recommended as a starting point for any new applications using the VersatileController. 
+
 Using the Controller with your own license key
 ==============================================
 
@@ -60,6 +62,8 @@ By default, the project builds the version that uses ARCore and ARFoundation to 
 If your device does not support this, you can still use the 3 DoF rotational tracking. Changes required include:
 - Disable ARCore under the project settings (XR Plug-in Management).
 - Edit the VersatileControllerPrefab under the VersatileControllerAndroid/Prefabs/Resources folder in the Assets. Disable the UseAR checkbox.
+
+A relatively recent apk is included in the repository, so you can install this directly to your phone without needing to build the controller application. 
 
 Acknowledgements
 ================
