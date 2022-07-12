@@ -1,7 +1,13 @@
 # VersatileController
 A 3 DoF virtual reality controller supporting VR development on Unity
 
+![Example application using the controller](Screenshots/applicationcontroller.png)
+![Example application using the controller, with the hand skin](Screenshots/applicationhand.png)
+
 The versatile controller is an application for an android phone that turns the phone into a controller for virtual reality applications. The supporting software provides a virtual representation of the controller that can be integrated into Unity applications.
+
+![View of the controller application](Screenshots/controllercontrols.png)
+![View of the controller application, with the hand skin](Screenshots/controllerhand.png)
 
 There are some dependencies that have to be installed into any Unity project that employs the flexible controller. The instructions for adding these are below.
 
