@@ -31,7 +31,9 @@ If you miss this step, the key can be set in Assets/Photon/PhotonUnityNetworking
 
 5. Add the VersatileController prefab under this folder to your project.
 
-6. You should now be able to run your Unity project, start the application on your phone and see the virtual version of the controller manipulated by the physical device.
+6. Copy the file from the repository at Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset over the one in the corresponding path in the Assets folder of your Unity project. This will overwrite the key you added in step 2, so update this file again if you've used your own Photon key. The important thing to retain is the list of RPCs which much match between the controller application and the unity versions of the application.
+
+7. You should now be able to run your Unity project, start the application on your phone and see the virtual version of the controller manipulated by the physical device.
 
 Using the Controller in your own application
 ============================================
