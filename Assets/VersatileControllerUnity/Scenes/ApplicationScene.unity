@@ -296,7 +296,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 921600756}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -476,7 +476,7 @@ MonoBehaviour:
   hiss: {fileID: 1997589171}
   pop: {fileID: 1997589170}
   objectTemplate: {fileID: 240830470121780517, guid: 65e5b451c56a96b20a485d115601bac7, type: 3}
-  startPoint: {x: 0, y: 3, z: 0}
+  startPoint: {x: 0, y: 3, z: 2}
   numberOfObjects: 30
   initialSpeed: 1
   timeInterval: 0.3

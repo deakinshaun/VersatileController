@@ -35,7 +35,7 @@ public class BalloonPop : MonoBehaviour
     public bool trigger;
     public GameObject laserBeam;
   }
-  private Vector3 controllerStartingPoint = new Vector3 (-1.0f, 1.0f, -6.0f);
+  private Vector3 controllerStartingPoint = new Vector3 (-0.5f, 1.0f, 0.0f);
   private Dictionary <VersatileControllerVirtual, ControllerState> controllers;
   
   void Start ()
@@ -54,7 +54,7 @@ public class BalloonPop : MonoBehaviour
     hand.name = "Hand";
     hand.transform.position = controllerStartingPoint;
     controller.transform.SetParent (hand.transform);
-    controllerStartingPoint += new Vector3 (1.0f, 0.0f, 0.0f);
+    controllerStartingPoint += new Vector3 (0.1f, 0.0f, 0.0f);
     
     // Subscribe to button events.
     VersatileControllerVirtual ctl = controller.GetComponent <VersatileControllerVirtual> ();
