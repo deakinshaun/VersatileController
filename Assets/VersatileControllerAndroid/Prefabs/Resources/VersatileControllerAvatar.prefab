@@ -2182,6 +2182,7 @@ MonoBehaviour:
   saberImage: {fileID: 7403353045620640733}
   saberOff: {fileID: 21300000, guid: ea97bbaf281d3f17c80effc7ce69c2ed, type: 3}
   saberOn: {fileID: 21300000, guid: e82fb7ff2235be013bc25939b9354b92, type: 3}
+  controller: {fileID: 2061189942968366262}
 --- !u!1 &2005406636149595096
 GameObject:
   m_ObjectHideFlags: 0

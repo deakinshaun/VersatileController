@@ -10,6 +10,8 @@ public class SaberControls : MonoBehaviour
   public Sprite saberOff;
   public Sprite saberOn;
   
+  public VersatileControllerPhysical controller;
+  
   private bool on = false;
   
   public void toggleSaber ()
@@ -19,10 +21,12 @@ public class SaberControls : MonoBehaviour
     if (on)
     {
       saberImage.sprite = saberOn;
+      controller.sendButtonDown ("Saber");
     }
     else
     {
       saberImage.sprite = saberOff;
+      controller.sendButtonUp ("Saber");
     }
   }
 }
