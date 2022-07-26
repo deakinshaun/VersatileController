@@ -71,6 +71,9 @@ public class ControllerTemplate : MonoBehaviour
       ctl.subscribeSlider ("MiddleFinger", sliderChanged);
       ctl.subscribeSlider ("RingFinger", sliderChanged);
       ctl.subscribeSlider ("LittleFinger", sliderChanged);
+      
+      // You can subscribe to all events, by leaving the button/slider name as null.
+      ctl.subscribeButtonDown (null, anyButtonDown);
     }
   }
   
@@ -105,4 +108,9 @@ public class ControllerTemplate : MonoBehaviour
       debugText.text = "Slider " + name + " has value " + value;
     }    
   }
+  public void anyButtonDown (string button, VersatileControllerVirtual ctl)
+  {
+    Debug.Log ("Just to show this works, button " + button + " is down");
+  }
+  
 }

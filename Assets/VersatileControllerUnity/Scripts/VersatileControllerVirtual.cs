@@ -107,6 +107,11 @@ public class VersatileControllerVirtual : MonoBehaviour
       buttonDownEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       buttonUpEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       sliderEvents = new Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> ();
+
+      allButtonDownEvents = new UnityEvent <string, VersatileControllerVirtual> ();
+      allButtonUpEvents = new UnityEvent <string, VersatileControllerVirtual> ();
+      allSliderEvents = new UnityEvent <string, float, VersatileControllerVirtual> ();
+      
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
       nameUpdates = new UnityEvent<string, bool, string> ();
       classInitialized = true;
@@ -114,8 +119,11 @@ public class VersatileControllerVirtual : MonoBehaviour
   }
   
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonDownEvents;
+  private UnityEvent <string, VersatileControllerVirtual> allButtonDownEvents;
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
+  private UnityEvent <string, VersatileControllerVirtual> allButtonUpEvents;
   private Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> sliderEvents;
+  private UnityEvent <string, float, VersatileControllerVirtual> allSliderEvents;
   private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
   private UnityEvent<string, bool, string> nameUpdates;
 
@@ -128,35 +136,60 @@ public class VersatileControllerVirtual : MonoBehaviour
   // Use this to receive call backs whenever the named button is pressed. 
   // The callback provides the name of the button, so that the callback
   // can be used to subscribe to multiple buttons.
+  // If button is null, then subscribe to all button down events.
   public void subscribeButtonDown (string button, UnityAction <string, VersatileControllerVirtual> call)
   {
     classInitialize ();
-    if (!buttonDownEvents.ContainsKey (button))
+    if ((button != null) && (!buttonDownEvents.ContainsKey (button)))
     {
       buttonDownEvents[button] = new UnityEvent <string, VersatileControllerVirtual> ();
     }
-    buttonDownEvents[button].AddListener (call);
+    
+    if (button == null)
+    {
+      allButtonDownEvents.AddListener (call);
+    }
+    else
+    {
+      buttonDownEvents[button].AddListener (call);
+    }
   }
   
   // Use this to receive call backs whenever the named button is released.
   public void subscribeButtonUp (string button, UnityAction <string, VersatileControllerVirtual> call)
   {
     classInitialize ();
-    if (!buttonUpEvents.ContainsKey (button))
+    if ((button != null) && (!buttonUpEvents.ContainsKey (button)))
     {
       buttonUpEvents[button] = new UnityEvent <string, VersatileControllerVirtual> ();
     }
-    buttonUpEvents[button].AddListener (call);
+
+    if (button == null)
+    {
+      allButtonUpEvents.AddListener (call);
+    }
+    else
+    {
+      buttonUpEvents[button].AddListener (call);
+    }
   }
   
   public void subscribeSlider (string slider, UnityAction <string, float, VersatileControllerVirtual> call)
   {
     classInitialize ();
-    if (!sliderEvents.ContainsKey (slider))
+    if ((slider != null) && (!sliderEvents.ContainsKey (slider)))
     {
       sliderEvents[slider] = new UnityEvent <string, float, VersatileControllerVirtual> ();
     }
-    sliderEvents[slider].AddListener (call);
+    
+    if (slider == null)
+    {
+      allSliderEvents.AddListener (call);
+    }
+    else
+    {
+      sliderEvents[slider].AddListener (call);
+    }
   }
   
   [PunRPC]
@@ -167,6 +200,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     {
       buttonDownEvents[button].Invoke (button, this);
     }
+    allButtonDownEvents.Invoke (button, this);
   }
   
   [PunRPC]
@@ -177,16 +211,17 @@ public class VersatileControllerVirtual : MonoBehaviour
     {
       buttonUpEvents[button].Invoke (button, this);
     }
+    allButtonUpEvents.Invoke (button, this);
   }
   [PunRPC]
   public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info)
   {
-    Debug.Log ("Slider: " + slider + " " + value);
     classInitialize ();
     if (sliderEvents.ContainsKey (slider))
     {
       sliderEvents[slider].Invoke (slider, value, this);
     }
+    allSliderEvents.Invoke (slider, value, this);
   }
   
   // Event tracking for pose updates
