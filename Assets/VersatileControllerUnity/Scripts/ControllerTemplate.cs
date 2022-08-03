@@ -24,6 +24,10 @@ public class ControllerTemplate : MonoBehaviour
   // You don't need this. This is just a text element so you
   // can see what values are received by the controller.
   public TextMeshProUGUI debugText;
+
+  // You don't need this either. This is just a text element so you
+  // can monitor the state of buttons reported by the controller..
+  public TextMeshProUGUI stateMonitorText;
   
   void Start()
   {
@@ -74,6 +78,10 @@ public class ControllerTemplate : MonoBehaviour
       
       // You can subscribe to all events, by leaving the button/slider name as null.
       ctl.subscribeButtonDown (null, anyButtonDown);
+
+      // Don't do this, unless you want to poll controllers. This means we have to
+      // keep a list of known controllers.
+      knownControllers.Add (ctl);
     }
   }
   
@@ -113,4 +121,42 @@ public class ControllerTemplate : MonoBehaviour
     Debug.Log ("Just to show this works, button " + button + " is down");
   }
   
+  // Keep track of controllers. Only for polling state. If you use event handlers,
+  // the controller details will be provided to you when the event occurs.
+  List <VersatileControllerVirtual> knownControllers = new List <VersatileControllerVirtual> ();
+  
+  // Ideally you don't need to do anything in the Update method. However, if
+  // you want to check on the state of particular buttons, you can do this by
+  // retrieving state from the controllers. Use of this pattern should be 
+  // chosen after consideration: if you're doing this just to determine when
+  // a button is pressed, use the event handlers instead. This approach requires
+  // that you keep track of which controller you want to query.
+  void Update ()
+  {
+    // Report on the state of some buttons, in each frame.
+    stateMonitorText.text = "";
+    // flag to check if some controllers have been removed and need to be deleted.
+    bool controllersRemoved = false; 
+    foreach (VersatileControllerVirtual ctl in knownControllers)
+    {
+      if (ctl != null)
+      {
+        stateMonitorText.text += ctl.gameObject.name + ":" + 
+                                 (ctl.getButtonState ("A") ? "A+" : "A-") + " " +
+                                 (ctl.getButtonState ("B") ? "B+" : "B-") + " " +
+                                 (ctl.getButtonState ("X") ? "X+" : "X-") + " " +
+                                 (ctl.getButtonState ("Y") ? "Y+" : "Y-") + " " +
+                                 "\n";
+      }
+      else
+      {
+        controllersRemoved = true;
+      }
+    }
+    if (controllersRemoved) 
+    // Safely traverse the controller list and remove controllers that no longer exist.
+    {
+      knownControllers.RemoveAll (ctl => ctl == null);
+    }
+  }
 }

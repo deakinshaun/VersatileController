@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using TMPro;
 using Photon.Pun;
 
+// This is the application side of the versatile controller. Use the public functions provided to subscribe
+// to events from the controller (or if appropriate) to poll the current state of controls.
 public class VersatileControllerVirtual : MonoBehaviour
 {
   [System.Serializable]
@@ -39,6 +41,11 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  // Register to receive a callback whenever a new controller connects. The callback
+  // will be provided with the gameobject representing the controller. This gameobject
+  // will have a VersatileControllerVirtual component. This method is static, so you
+  // don't need any existing controller before you can register to learn about new
+  // controllers.
   public static void subscribeNewControllers (UnityAction<GameObject> call)
   {
     initialize ();
@@ -51,6 +58,8 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  // Set the skin and handedness for a given controller representation. The 
+  // appropriate skin needs to be part of the virtual controller prefab.
   private void setSkin (string skinName, bool isLeftHanded)
   {
     // Switch off all skins
@@ -77,6 +86,8 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  // This function is called (remotely) by the physical controller whenever the controller
+  // application starts.
   [PunRPC]
   public void ControllerStarted (string name, bool isLeftHanded, string skinName)
   {
@@ -100,6 +111,9 @@ public class VersatileControllerVirtual : MonoBehaviour
 
   private bool classInitialized = false;
   
+  // This function ensures that all data structures are initialized. Each internal
+  // function calls this, so that initialization state is guaranteed, regardless of 
+  // the Unity initialization sequence.
   private void classInitialize ()
   {
     if (!classInitialized)
@@ -111,6 +125,9 @@ public class VersatileControllerVirtual : MonoBehaviour
       allButtonDownEvents = new UnityEvent <string, VersatileControllerVirtual> ();
       allButtonUpEvents = new UnityEvent <string, VersatileControllerVirtual> ();
       allSliderEvents = new UnityEvent <string, float, VersatileControllerVirtual> ();
+
+      buttonState = new Dictionary <string, bool> ();
+      sliderState = new Dictionary <string, float> ();
       
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
       nameUpdates = new UnityEvent<string, bool, string> ();
@@ -118,15 +135,21 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  // Dictionaries to map button/slider names to various callbacks and state data.
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonDownEvents;
   private UnityEvent <string, VersatileControllerVirtual> allButtonDownEvents;
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
   private UnityEvent <string, VersatileControllerVirtual> allButtonUpEvents;
+  private Dictionary <string, bool> buttonState;
+  
   private Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> sliderEvents;
   private UnityEvent <string, float, VersatileControllerVirtual> allSliderEvents;
+  private Dictionary <string, float> sliderState;
+  
   private UnityEvent<GameObject, Quaternion, Vector3> poseEvents;
   private UnityEvent<string, bool, string> nameUpdates;
 
+  // Register to receive a callback whenever the name of the controller is updated.
   public void subscribeNameUpdates (UnityAction <string, bool, string> call)
   {
     classInitialize ();
@@ -143,6 +166,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     if ((button != null) && (!buttonDownEvents.ContainsKey (button)))
     {
       buttonDownEvents[button] = new UnityEvent <string, VersatileControllerVirtual> ();
+      buttonState[button] = false;
     }
     
     if (button == null)
@@ -162,6 +186,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     if ((button != null) && (!buttonUpEvents.ContainsKey (button)))
     {
       buttonUpEvents[button] = new UnityEvent <string, VersatileControllerVirtual> ();
+      buttonState[button] = false;
     }
 
     if (button == null)
@@ -174,12 +199,14 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  // Subscribe to controller events.
   public void subscribeSlider (string slider, UnityAction <string, float, VersatileControllerVirtual> call)
   {
     classInitialize ();
     if ((slider != null) && (!sliderEvents.ContainsKey (slider)))
     {
       sliderEvents[slider] = new UnityEvent <string, float, VersatileControllerVirtual> ();
+      sliderState[slider  ] = 0.0f;
     }
     
     if (slider == null)
@@ -192,46 +219,79 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
   
+  // Called from the physical controller to indicate a button has been pressed.
   [PunRPC]
   public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info)
   {
     classInitialize ();
     if (buttonDownEvents.ContainsKey (button))
     {
+      buttonState[button] = true;
       buttonDownEvents[button].Invoke (button, this);
     }
     allButtonDownEvents.Invoke (button, this);
   }
   
+  // Called from the physical controller to indicate a button has been released.
   [PunRPC]
   public void SendButtonUp (string button, string systemID, string controllerID, PhotonMessageInfo info)
   {
     classInitialize ();
     if (buttonUpEvents.ContainsKey (button))
     {
+      buttonState[button] = false;
       buttonUpEvents[button].Invoke (button, this);
     }
     allButtonUpEvents.Invoke (button, this);
   }
+
+  // Called from the physical controller to indicate a slider value has changed.
   [PunRPC]
   public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info)
   {
     classInitialize ();
     if (sliderEvents.ContainsKey (slider))
     {
+      sliderState[slider] = value;
       sliderEvents[slider].Invoke (slider, value, this);
     }
     allSliderEvents.Invoke (slider, value, this);
   }
+
+  // State checking.
+  
+  // Returns the state of the given button. Returns false if the button has
+  // never provided a state update, or doesn't exist.
+  public bool getButtonState (string button)
+  {
+    if (buttonState.ContainsKey (button))
+    {
+      return buttonState[button];
+    }
+    return false;
+  }
+  
+  // Returns the last known value of the given slider. Returns 0 if the slider
+  // doesn't exist or has never provided any value updates.
+  public float getSliderState (string slider)
+  {
+    if (sliderState.ContainsKey (slider))
+    {
+      return sliderState[slider];
+    }
+    return 0.0f;
+  }
   
   // Event tracking for pose updates
 
+  // Subscribe to updates whenever the physical controller pose changes (i.e. it is moved).
   public void subscribePose (UnityAction <GameObject, Quaternion, Vector3> call)
   {
     classInitialize ();
     poseEvents.AddListener (call);
   }
 
+  // Called from the physical controller to communicate pose updates.
   [PunRPC]
   void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz, PhotonMessageInfo info)
   {
