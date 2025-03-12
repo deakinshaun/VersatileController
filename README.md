@@ -22,18 +22,16 @@ This phone needs to be equipped with a gyroscope (most models are, but some do n
 
 1. Open Unity with the project you want to add the controller to.
 
-2. Install Photon Pun2. When prompted, provide the key: 0b3d611a-0158-4804-a33e-18a9e4456aff
-If you miss this step, the key can be set in Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset, as the App Id PUN (open the Server/Cloud Settings if you can't see this).
+2. Install Photon Fusion 2. When prompted, provide the key: 5a39e88d-2532-4bfc-91b1-6f5a557bb91c
+If you miss this step, the key can be set in Assets/Photon/Fusion/Resources/PhotonAppSettings.asset, as the App Id PUN (open the Server/Cloud Settings if you can't see this).
 
-3. You may receive a prompt to install TextMesh Pro. The TMP Essentials are required, so install these if asked.
+3. You may receive a prompt to install TextMesh Pro. The TMP Essentials are required, so install these. 
 
 4. Copy the VersatileControllerUnity folder from this repository into the Assets folder of your Unity project. 
 
 5. Add the VersatileController prefab under this folder to your project.
 
-6. Copy the file from the repository at Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset over the one in the corresponding path in the Assets folder of your Unity project. This will overwrite the key you added in step 2, so update this file again if you've used your own Photon key. The important thing to retain is the list of RPCs which much match between the controller application and the unity versions of the application.
-
-7. You should now be able to run your Unity project, start the application on your phone and see the virtual version of the controller manipulated by the physical device.
+6. You should now be able to run your Unity project, start the application on your phone and see the virtual version of the controller manipulated by the physical device.
 
 Using the Controller in your own application
 ============================================
@@ -63,7 +61,7 @@ Building the controller application
 
 The project is set to build the controller application (as an apk) directly.
 
-Use File/Build And Run to start this.
+Use File/Build And Run to start this. Make sure the ControllerScene is the only scene enabled in the Scene List.
 
 By default, the project builds the version that uses ARCore and ARFoundation to provide rotational and positional tracking (a 6 DoF controller).
 
