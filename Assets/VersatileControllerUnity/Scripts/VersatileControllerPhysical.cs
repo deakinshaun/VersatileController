@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 
 #if PHOTON_UNITY_NETWORKING
@@ -246,7 +247,7 @@ public class VersatileControllerPhysical : MonoBehaviour
       // Controls must only be enabled for the active controller - otherwise the imposter for another controller
       // will take over this device.
       defaultControls.gameObject.SetActive (true);
-      Input.gyro.enabled = true;
+      InputSystem.EnableDevice (InputSystem.GetDevice<UnityEngine.InputSystem.AttitudeSensor>());
       announceController ();
       
       if (useAR)
@@ -280,7 +281,7 @@ public class VersatileControllerPhysical : MonoBehaviour
     }
     else
     {
-      Quaternion q = Input.gyro.attitude;
+      Quaternion q = InputSystem.GetDevice<UnityEngine.InputSystem.AttitudeSensor>().attitude.ReadValue ();
       return new Quaternion (-q.x, -q.z, -q.y, q.w);
     }
   }
@@ -301,6 +302,7 @@ public class VersatileControllerPhysical : MonoBehaviour
   void Update()   
   {
     announceController ();
+    
     if (useAR && (ARTrackable != null))
     {
       Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
