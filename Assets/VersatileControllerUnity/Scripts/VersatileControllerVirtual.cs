@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
-using Photon.Pun;
+
+#if PHOTON_UNITY_NETWORKING
+using Fusion;
+#endif
 
 // This is the application side of the versatile controller. Use the public functions provided to subscribe
 // to events from the controller (or if appropriate) to poll the current state of controls.
@@ -16,9 +19,11 @@ public class VersatileControllerVirtual : MonoBehaviour
     public VersatileControllerPhysical.Handedness whichHand;
     public GameObject [] parts;
   }
-  
-  public TextMeshProUGUI debug;
 
+#if PHOTON_UNITY_NETWORKING  
+  public TextMeshProUGUI debug;
+#endif
+  
   [Tooltip ("Disable this if you want to manually set the position and rotation, using the control input. Otherwise the object this component is attached to will be driven directly by this component")]
   public bool setPose = true;
   
@@ -88,7 +93,6 @@ public class VersatileControllerVirtual : MonoBehaviour
   
   // This function is called (remotely) by the physical controller whenever the controller
   // application starts.
-  [PunRPC]
   public void ControllerStarted (string name, bool isLeftHanded, string skinName)
   {
     initialize ();
@@ -220,8 +224,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   }
   
   // Called from the physical controller to indicate a button has been pressed.
-  [PunRPC]
-  public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info)
+  public void SendButtonDown (string button, string systemID, string controllerID)
   {
     classInitialize ();
     if (buttonDownEvents.ContainsKey (button))
@@ -233,8 +236,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   }
   
   // Called from the physical controller to indicate a button has been released.
-  [PunRPC]
-  public void SendButtonUp (string button, string systemID, string controllerID, PhotonMessageInfo info)
+  public void SendButtonUp (string button, string systemID, string controllerID)
   {
     classInitialize ();
     if (buttonUpEvents.ContainsKey (button))
@@ -246,8 +248,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   }
 
   // Called from the physical controller to indicate a slider value has changed.
-  [PunRPC]
-  public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info)
+  public void SendSliderChanged (string slider, float value, string systemID, string controllerID)
   {
     classInitialize ();
     if (sliderEvents.ContainsKey (slider))
@@ -292,8 +293,7 @@ public class VersatileControllerVirtual : MonoBehaviour
   }
 
   // Called from the physical controller to communicate pose updates.
-  [PunRPC]
-  void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz, PhotonMessageInfo info)
+  public void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz)
   {
     classInitialize ();
     

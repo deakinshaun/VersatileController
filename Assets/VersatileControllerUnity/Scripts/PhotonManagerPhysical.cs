@@ -1,21 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-using Photon.Pun;
-using Photon.Realtime;
+#if PHOTON_UNITY_NETWORKING
+using Fusion;
+using Fusion.Sockets;
+#endif 
+
 using TMPro;
-
-using System;
 using System.IO;
 using System.Text;
 
 using UnityEngine;
 
-public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
+public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
 {
-  [Tooltip ("The avatar representation on the physical side of the controller")]
-  public GameObject avatarPrefab;
-  
   [Tooltip ("The system ID for all your controllers. Set this to be distinct if you don't want other people's controllers being used in your experience")]
   private string systemID = "General";
   [Tooltip ("The controller ID for this specific controllers. Use this to distinguish between different controllers in the same application (e.g. LeftHand and RighHand)")]
@@ -25,6 +26,10 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
   [Tooltip ("Skin - the name of the skin applied to this controller.")]
   public string skinName = "Controller Emulation";
   
+  private NetworkRunner networkRunner;
+  private PlayerRef networkPlayer;
+  private bool setControlData = false;
+
   // Define the system and controller IDs. These are stored persistently, so
   // are reused when the controller next reconnects.
   public void updateConnectionDetails (string sid, string cid, bool left, string skin)
@@ -69,14 +74,9 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
   
   void Start()
   {
-    // Recreate the pool, so avatars with the same name can exist
-    // on different platforms.
-    DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
-    if (pool != null)
-    {
-      pool.ResourceCache.Add(avatarPrefab.name, avatarPrefab);
-    }
-    connect ();
+#if PHOTON_UNITY_NETWORKING
+    // connect ();
+#endif    
   }
 
   // Restart the connection.
@@ -86,33 +86,95 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
     connect ();
   }
   
+  private IEnumerator connectCoroutine ()
+  {
+#if PHOTON_UNITY_NETWORKING
+    if (networkRunner == null)
+    {
+      networkRunner = gameObject.AddComponent <NetworkRunner> ();
+    }
+        
+    Task t = networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Client, SessionName = "ApplicationLobby" });    
+    yield return new WaitUntil (() => t.IsCompleted);
+#endif    
+  }
+
+  private bool connectionInProgress = false;
   private void connect ()
   {
-    Debug.Log("Starting - connected status = " + PhotonNetwork.IsConnected);
     unpersist ();
-    PhotonNetwork.ConnectUsingSettings();
+    
+    if ((networkRunner == null) && (!connectionInProgress))
+    {
+      connectionInProgress = true;
+      StartCoroutine (connectCoroutine ());
+    }
+  }
+  
+  private IEnumerator disconnectCoroutine ()
+  {
+#if PHOTON_UNITY_NETWORKING
+    networkRunner.Disconnect (networkPlayer);
+    Destroy (networkRunner);
+    yield return null;
+    networkRunner = null;
+#endif    
   }
   
   private void disconnect ()
   {
-    PhotonNetwork.Disconnect ();
+    if ((networkRunner != null) && (!connectionInProgress))
+    {
+      StartCoroutine (disconnectCoroutine ());
+    }
   }
   
-  public override void OnConnectedToMaster ()
+  public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
   {
-    Debug.Log("Connected to Master.");
-    RoomOptions roomopt = new RoomOptions();
-    PhotonNetwork.JoinOrCreateRoom(systemID, roomopt, new TypedLobby("ApplicationLobby", LobbyType.Default));
+#if PHOTON_UNITY_NETWORKING
+    // base.OnJoinedRoom();
+    Debug.Log("Joined room with " + runner.ActivePlayers.Count () + " particpants"); 
+    connectionInProgress = false;
+    networkPlayer = player;
+    setControlData = false;
+#endif    
   }
   
-  public override void OnJoinedRoom()
+  private float reconnectInterval = 2.0f;
+  private float reconnectTimer = 0.0f;
+  
+  public void Update ()
   {
-    base.OnJoinedRoom();
-    Debug.Log("Joined room with " +
-    PhotonNetwork.CurrentRoom.PlayerCount + " particpants");
+    if (!setControlData)
+    {
+      if ((networkRunner != null) && (networkRunner.LocalPlayer != null) && networkRunner.GetPlayerObject (networkRunner.LocalPlayer) != null)
+      {
+        GameObject avatar = networkRunner.GetPlayerObject (networkRunner.LocalPlayer).gameObject;
+        if (avatar.GetComponentInChildren <VersatileControllerPhysical> (true) != null)
+        {
+          avatar.GetComponentInChildren <VersatileControllerPhysical> (true).setPhotonManager (this, systemID, controllerID, isLeftHanded, skinName, networkRunner, networkRunner.LocalPlayer);
+          
+          setControlData = true;
+        }
+      }
+    }
     
-    GameObject avatar = PhotonNetwork.Instantiate(avatarPrefab.name, new Vector3(), Quaternion.identity, 0);
-    avatar.GetComponent <VersatileControllerPhysical> ().setPhotonManager (this, systemID, controllerID, isLeftHanded, skinName);
+    if (networkRunner?.IsRunning == true)
+    {
+      reconnectTimer = reconnectInterval;
+    }
+    else
+    {
+      reconnectTimer -= Time.deltaTime;
+      if (reconnectTimer < 0.0f)
+      {
+        reconnectTimer = reconnectInterval;
+        
+        disconnect ();
+
+        connect ();
+      }
+    }
   }
   
   void OnApplicationPause(bool pauseStatus)
@@ -127,4 +189,37 @@ public class PhotonManagerPhysical : MonoBehaviourPunCallbacks
       connect ();
     }
   }
+
+  public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) 
+  { 
+    Debug.Log ("Server shutdown: retrying connection");
+    networkRunner.enabled = false;
+    connectionInProgress = false;
+  }
+
+  public void OnDisconnectedFromServer (NetworkRunner runner, NetDisconnectReason reason) 
+  { 
+    Debug.Log ("Server disconnected: retrying connection");
+    connectionInProgress = false;
+    disconnect ();
+  }
+  
+  public void OnConnectedToServer(NetworkRunner runner) { }
+  public void OnObjectExitAOI (NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+  public void OnObjectEnterAOI (NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+  public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+  public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+  public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+  public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+  public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
+  public void OnReliableDataReceived (NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment< byte > data) { }
+  public void OnReliableDataProgress (NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+  public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+  public void OnInput(NetworkRunner runner, NetworkInput input) { }
+  public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+  public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+  public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+  public void OnSceneLoadDone(NetworkRunner runner) { }
+  public void OnSceneLoadStart(NetworkRunner runner) { }
+  
 }

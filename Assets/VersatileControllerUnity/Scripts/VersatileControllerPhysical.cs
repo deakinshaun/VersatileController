@@ -1,11 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Photon.Pun;
 
-public class VersatileControllerPhysical : MonoBehaviourPun
+#if PHOTON_UNITY_NETWORKING
+using Fusion;
+using Fusion.Sockets;
+#endif
+
+public class VersatileControllerPhysical : MonoBehaviour
 {
   public enum Handedness
   {
@@ -29,13 +34,17 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   [Header ("Default Controller Widgets")]
   [Tooltip ("Canvas for this set of widgets, so they can be switched on and off as a group")]
   public Canvas defaultControls;
+#if PHOTON_UNITY_NETWORKING
   public TMP_InputField systemID;
   public TMP_InputField controllerID;
+#endif  
   [Tooltip ("Status display")]
+#if PHOTON_UNITY_NETWORKING
   public TextMeshProUGUI statusText;
   public Toggle leftHandToggle;
   public Toggle rightHandToggle;
   public TMP_Dropdown skinSelection;
+#endif
   
   [SerializeField]
   public Skins [] skins;
@@ -51,19 +60,30 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   // event handlers from responding.
   private bool directlySetting = false;
   private bool setSkins = false;
+
+  private NetworkRunner networkRunner;
+  private PlayerRef networkPlayer;
+
+  private ControllerMode controllerMode;
   
   // Called to initialize controller interface, with details of the system and 
   // controller IDs used.
-  public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid, bool left, string skin)
+  public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid, bool left, string skin, NetworkRunner ns, PlayerRef np)
   {
+    networkRunner = ns;
+    networkPlayer = np;
+    
+    setStatus ();
+    
     addSkins ();
     directlySetting = true;
     photonManager = pm;
+#if PHOTON_UNITY_NETWORKING    
     systemID.text = sid;
     controllerID.text = cid;
     leftHandToggle.isOn = left;
     rightHandToggle.isOn = !left;
-
+    
     int option = skinSelection.options.FindIndex(option => option.text == skin);
     if (option < 0)
     {
@@ -71,10 +91,16 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     }
     skinSelection.SetValueWithoutNotify (option);
     skinSelection.RefreshShownValue ();
+#endif
     
     panelVisibility ();
 
     directlySetting = false;    
+  }
+  
+  public void setControllerMode (ControllerMode cm)
+  {
+    controllerMode = cm;
   }
   
   // Set current pose as the "zero" state.
@@ -86,57 +112,54 @@ public class VersatileControllerPhysical : MonoBehaviourPun
   
   public void sendButtonDown (string button)
   {
-    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+#if PHOTON_UNITY_NETWORKING    
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
-      GetComponent<PhotonView>().RPC ("SendButtonDown", RpcTarget.All, button, systemID.text, controllerID.text);
+      controllerMode.RPC_SendButtonDown (button, systemID.text, controllerID.text);
     }
+#endif    
   }
   public void sendButtonUp (string button)
   {
-    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+#if PHOTON_UNITY_NETWORKING
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
-      GetComponent<PhotonView>().RPC ("SendButtonUp", RpcTarget.All, button, systemID.text, controllerID.text);
+      controllerMode.RPC_SendButtonUp (button, systemID.text, controllerID.text);
     }
+#endif    
   }
   public void sendSliderChanged (string slider, float value)
   {
-    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+#if PHOTON_UNITY_NETWORKING
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
-      GetComponent<PhotonView>().RPC ("SendSliderChanged", RpcTarget.All, slider, value, systemID.text, controllerID.text);
+      controllerMode.RPC_SendSliderChanged (slider, value, systemID.text, controllerID.text);
     }
+#endif    
   }
-  
-  // Just stubs, since physical controllers don't need to process these.
-  [PunRPC]
-  public void ControllerStarted (string name, bool isLeftHanded, string skinName) {}
-  [PunRPC]
-  public void SendButtonDown (string button, string systemID, string controllerID, PhotonMessageInfo info) {}
-  [PunRPC]
-  public void SendButtonUp (string button, string systemID, string controllerID, PhotonMessageInfo info) {}
-  [PunRPC]
-  public void SendSliderChanged (string slider, float value, string systemID, string controllerID, PhotonMessageInfo info) {}
-  [PunRPC]
-  void SendControlInfo (float x, float y, float z, float w, float px, float py, float pz, PhotonMessageInfo info) {}
-  
+    
   private float announcementTimer = 0.0f;
   private float announcementLimit = 2.0f; // The time delay between new announcements of this controller.
   private void announceController ()
   {
-    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+#if PHOTON_UNITY_NETWORKING
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
       announcementTimer += Time.deltaTime;
       
       if (announcementTimer > announcementLimit)
       {
-        GetComponent<PhotonView>().RPC ("ControllerStarted", RpcTarget.All, controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
+        controllerMode.RPC_ControllerStarted (controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
         announcementTimer = 0.0f;
       }
     }
+#endif    
   }
   
   // One of the system/controller IDs have changed. Reconnect.
   public void changeConnection (string value)
   {
+#if PHOTON_UNITY_NETWORKING
     if (!directlySetting)
     {
       if (photonManager != null)
@@ -145,18 +168,21 @@ public class VersatileControllerPhysical : MonoBehaviourPun
         photonManager.reconnect ();
       }
     }
+#endif    
   }
   
   private void reportStatus ()
   {
-    if (PhotonNetwork.IsConnected)
+#if PHOTON_UNITY_NETWORKING
+    if (networkRunner?.IsConnectedToServer == true)
     {
-      statusText.text = "Connected to region: " + PhotonNetwork.CloudRegion;
+      statusText.text = "Connected to region: " + networkRunner.SessionInfo.Region;
     }
     else
     {
       statusText.text = "Disconnected";
     }
+#endif    
   }
   
   // Set the visibility of the various panels, based on the current skin.
@@ -174,6 +200,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       }
     }
 
+#if PHOTON_UNITY_NETWORKING
     // Switch the active skin on.
     foreach (Skins s in skins)
     {
@@ -187,6 +214,7 @@ public class VersatileControllerPhysical : MonoBehaviourPun
         }
       }
     }    
+#endif    
   }
   
   private void addSkins ()
@@ -201,16 +229,19 @@ public class VersatileControllerPhysical : MonoBehaviourPun
           options.Add (s.name);
         }
       }
+#if PHOTON_UNITY_NETWORKING
       skinSelection.ClearOptions ();
       skinSelection.AddOptions (options);
-        
+#endif
+      
       setSkins = true;
     }
   }
   
-  private void Start()
+  private void setStatus ()
   {
-    if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+#if PHOTON_UNITY_NETWORKING
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
       // Controls must only be enabled for the active controller - otherwise the imposter for another controller
       // will take over this device.
@@ -226,7 +257,18 @@ public class VersatileControllerPhysical : MonoBehaviourPun
       addSkins ();
       
       reportStatus ();
+      gameObject.SetActive (true);
     }
+    else
+    {
+      gameObject.SetActive (false);
+    }
+#endif    
+  }
+  
+  void Start ()
+  {
+    setStatus ();
   }
   
   private Quaternion getOrientation ()
@@ -263,27 +305,30 @@ public class VersatileControllerPhysical : MonoBehaviourPun
     {
       Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
       Vector3 position = getPosition () - restPosition;
-      
-      GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
-                                    orientation.x, orientation.y, orientation.z, orientation.w,
-                                    position.x, position.y, position.z);
+
+#if PHOTON_UNITY_NETWORKING      
+      controllerMode.RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
+                           position.x, position.y, position.z);
+#endif      
     }
     else
     {
       if (SystemInfo.supportsGyroscope)
       {
-        if (photonView.IsMine == true || PhotonNetwork.IsConnected == false)
+#if PHOTON_UNITY_NETWORKING
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
         {
           
           // Convert android to unity coordinates.
           Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
           Vector3 position = getPosition () - restPosition;
           
-          GetComponent<PhotonView>().RPC("SendControlInfo", RpcTarget.All, 
-                                        orientation.x, orientation.y, orientation.z, orientation.w,
-                                        position.x, position.y, position.z);
+          controllerMode.RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
+                               position.x, position.y, position.z);
         }
+#endif          
       }
     }
-  }  
+  }
+
 }

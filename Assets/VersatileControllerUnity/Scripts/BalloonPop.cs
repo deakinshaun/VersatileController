@@ -99,7 +99,7 @@ public class BalloonPop : MonoBehaviour
       numberOfObjects--;
       GameObject g = Instantiate (objectTemplate);
       g.transform.position = startPoint;
-      g.GetComponent <Rigidbody> ().velocity = Random.onUnitSphere * initialSpeed;
+      g.GetComponent <Rigidbody> ().linearVelocity = Random.onUnitSphere * initialSpeed;
       g.GetComponent <MeshRenderer> ().material.color = Random.ColorHSV (0, 1, 0.5f, 1, 0.5f, 1);
     }
     
