@@ -65,11 +65,13 @@ Use File/Build And Run to start this. Make sure the ControllerScene is the only 
 
 By default, the project builds the version that uses ARCore and ARFoundation to provide rotational and positional tracking (a 6 DoF controller).
 
-If your device does not support this, you can still use the 3 DoF rotational tracking. Changes required include:
+If your device does not support this, you can still use the 3 DoF rotational tracking. In particular, to build the WebGL version you do need to switch to 3 DoF. Changes required include:
 - Disable ARCore under the project settings (XR Plug-in Management).
 - Edit the VersatileControllerPrefab under the VersatileControllerAndroid/Prefabs/Resources folder in the Assets. Disable the UseAR checkbox.
 
 A relatively recent apk is included in the repository, so you can install this directly to your phone without needing to build the controller application. 
+
+A WebGL version can be accessed at: https://rawcdn.githack.com/deakinshaun/VersatileController/main/WebController/index.html
 
 Acknowledgements
 ================
