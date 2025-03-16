@@ -247,7 +247,10 @@ public class VersatileControllerPhysical : MonoBehaviour
       // Controls must only be enabled for the active controller - otherwise the imposter for another controller
       // will take over this device.
       defaultControls.gameObject.SetActive (true);
-      InputSystem.EnableDevice (InputSystem.GetDevice<UnityEngine.InputSystem.AttitudeSensor>());
+      if (SystemInfo.supportsGyroscope)
+      {
+        InputSystem.EnableDevice (InputSystem.GetDevice<UnityEngine.InputSystem.AttitudeSensor>());
+      }
       announceController ();
       
       if (useAR)
