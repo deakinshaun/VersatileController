@@ -345,8 +345,11 @@ public class HandTracking : MonoBehaviour
     void OnDestroy()
     {
         Debug.Log ("On destroy");
-        m_DetectAwaitable.Cancel();
-        sourceTexture.Stop ();
-        Destroy (sourceTexture);
+        m_DetectAwaitable?.Cancel();
+        if (sourceTexture != null)
+        {
+            sourceTexture.Stop ();
+            Destroy (sourceTexture);
+        }
     }
 }
