@@ -141,7 +141,9 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 0.1.0
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: -8353926509279297491, guid: ceadcfdfa36dcaedeb194d02f3c3172c, type: 2}
+  - {fileID: -7268297785364796194, guid: f6a4c9d35f17e9d678f80fbd34a6dc5c, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -817,9 +819,23 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS
-    Standalone: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS
-    Windows Store Apps: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS
+    Android: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS;FUSION_WEAVER;FUSION2;FUSION_LOGLEVEL_ERROR
+    EmbeddedLinux: FUSION_LOGLEVEL_ERROR
+    GameCoreScarlett: FUSION_LOGLEVEL_ERROR
+    GameCoreXboxOne: FUSION_LOGLEVEL_ERROR
+    LinuxHeadlessSimulation: FUSION_LOGLEVEL_ERROR
+    Nintendo Switch: FUSION_LOGLEVEL_ERROR
+    PS4: FUSION_LOGLEVEL_ERROR
+    PS5: FUSION_LOGLEVEL_ERROR
+    QNX: FUSION_LOGLEVEL_ERROR
+    ReservedCFE: FUSION_LOGLEVEL_ERROR
+    Standalone: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS;FUSION_LOGLEVEL_ERROR
+    VisionOS: FUSION_LOGLEVEL_ERROR
+    WebGL: FUSION_LOGLEVEL_ERROR
+    Windows Store Apps: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS;FUSION_LOGLEVEL_ERROR
+    XboxOne: FUSION_LOGLEVEL_ERROR
+    iPhone: FUSION_LOGLEVEL_ERROR
+    tvOS: FUSION_LOGLEVEL_ERROR
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -830,7 +846,7 @@ PlayerSettings:
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
   suppressCommonWarnings: 1
-  allowUnsafeCode: 0
+  allowUnsafeCode: 1
   useDeterministicCompilation: 1
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1

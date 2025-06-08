@@ -523,7 +523,18 @@
                 },
                 {
                     "name": "first",
-                    "id": "abf752ec-feee-4d51-b530-f0870f48acc9",
+                    "id": "39d00956-a178-45e4-8a68-080b1b82cfc2",
+                    "path": "<VersatileController>{LeftHand}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "second",
+                    "id": "1df34581-6299-4c40-a8c3-781d1798a880",
                     "path": "<XRController>{LeftHand}/pointerPosition",
                     "interactions": "",
                     "processors": "",
@@ -1605,6 +1616,17 @@
                 },
                 {
                     "name": "first",
+                    "id": "ddeeca43-bf1d-47b0-bf66-96db3dd401f5",
+                    "path": "<VersatileController>{RightHand}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Second",
                     "id": "9717e367-64a4-440a-9974-1e641d753eb2",
                     "path": "<XRController>{RightHand}/pointerPosition",
                     "interactions": "",
