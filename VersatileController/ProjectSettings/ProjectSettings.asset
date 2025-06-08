@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: 65e53c127059614a1b663c6d325e565f
+  productGUID: 3e329901d1dcee7dabb2dd1c64f584a4
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DeakinUniversity
-  productName: XRInteractionToolkit
+  productName: VersatileController
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -140,8 +140,9 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.1.0
-  preloadedAssets: []
+  bundleVersion: 0.2.0
+  preloadedAssets:
+  - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -163,7 +164,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.DeakinUniversity.XRInteractionToolkit
+    Android: com.DeakinUniversity.VersatileController
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
     iPhone: com.Unity-Technologies.com.unity.template.urp-blank
   buildNumber:
@@ -288,7 +289,14 @@ PlayerSettings:
   AndroidAppBundleSizeToValidate: 150
   AndroidReportGooglePlayAppDependencies: 1
   androidSymbolsSizeThreshold: 800
-  m_BuildTargetIcons: []
+  m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 0ba69abc949cbd7968a3ca7538f93b7b, type: 3}
+      m_Width: 128
+      m_Height: 128
+      m_Kind: 0
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: iPhone
     m_Icons:
@@ -389,7 +397,9 @@ PlayerSettings:
       m_SubKind: App Store
   - m_BuildTarget: Android
     m_Icons:
-    - m_Textures: []
+    - m_Textures:
+      - {fileID: 2800000, guid: 0ba69abc949cbd7968a3ca7538f93b7b, type: 3}
+      - {fileID: 2800000, guid: 9460dccf908c3e0a19c3eda3c057473b, type: 3}
       m_Width: 432
       m_Height: 432
       m_Kind: 2
@@ -419,7 +429,8 @@ PlayerSettings:
       m_Height: 81
       m_Kind: 2
       m_SubKind: 
-    - m_Textures: []
+    - m_Textures:
+      - {fileID: 2800000, guid: 0ba69abc949cbd7968a3ca7538f93b7b, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 1
@@ -449,7 +460,8 @@ PlayerSettings:
       m_Height: 36
       m_Kind: 1
       m_SubKind: 
-    - m_Textures: []
+    - m_Textures:
+      - {fileID: 2800000, guid: 0ba69abc949cbd7968a3ca7538f93b7b, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 0
@@ -525,7 +537,7 @@ PlayerSettings:
     m_APIs: 10000000
     m_Automatic: 1
   - m_BuildTarget: AndroidPlayer
-    m_APIs: 150000000b000000
+    m_APIs: 0b00000015000000
     m_Automatic: 0
   m_BuildTargetVRSettings: []
   m_DefaultShaderChunkSizeInMB: 16
@@ -817,7 +829,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS;FUSION_WEAVER;FUSION2;FUSION_LOGLEVEL_ERROR;VersatileControllerVirtualClass
+    Android: FUSION_WEAVER;FUSION2;VersatileControllerPhysicalClass;FUSION_LOGLEVEL_ERROR
     EmbeddedLinux: FUSION_LOGLEVEL_ERROR
     GameCoreScarlett: FUSION_LOGLEVEL_ERROR
     GameCoreXboxOne: FUSION_LOGLEVEL_ERROR
@@ -827,10 +839,10 @@ PlayerSettings:
     PS5: FUSION_LOGLEVEL_ERROR
     QNX: FUSION_LOGLEVEL_ERROR
     ReservedCFE: FUSION_LOGLEVEL_ERROR
-    Standalone: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS;FUSION_LOGLEVEL_ERROR
+    Standalone: FUSION_LOGLEVEL_ERROR
     VisionOS: FUSION_LOGLEVEL_ERROR
     WebGL: FUSION_LOGLEVEL_ERROR
-    Windows Store Apps: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS;FUSION_LOGLEVEL_ERROR
+    Windows Store Apps: FUSION_LOGLEVEL_ERROR
     XboxOne: FUSION_LOGLEVEL_ERROR
     iPhone: FUSION_LOGLEVEL_ERROR
     tvOS: FUSION_LOGLEVEL_ERROR
@@ -854,14 +866,14 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: XRInteractionToolkit
+  metroPackageName: VersatileControl
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: XRInteractionToolkit
+  metroApplicationDescription: VersatileControl
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0

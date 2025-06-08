@@ -1,5 +1,3 @@
-#define VersatileControllerVirtualClass
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -440,7 +438,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     controllerState.isTracked = false;
     controllerState.trackingState = default;
     Debug.Log ("Disabling versatile controller");
-    InputState.Change(controllerDevice, controllerState);
+    InputState.Change (controllerDevice, controllerState);
   }
 
 }
