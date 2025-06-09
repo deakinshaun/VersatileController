@@ -88,6 +88,19 @@ public class ControllerMode : NetworkBehaviour
     #if FUSION2
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     #endif  
+    public void RPC_Send2DAxisTouch (string touch, Vector2 value, string systemID, string controllerID) 
+    {
+        if (networkRunner?.IsServer == true)
+        {
+#if VersatileControllerVirtualClass
+            vcv?.Send2DAxisTouch (touch, value, systemID, controllerID);
+#endif            
+        }        
+    }
+    
+    #if FUSION2
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    #endif  
     public void RPC_SendSliderChanged (string slider, float value, string systemID, string controllerID) 
     {
         if (networkRunner?.IsServer == true)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 using TMPro;
 
 #if FUSION2
@@ -120,6 +121,28 @@ public class VersatileControllerPhysical : MonoBehaviour
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
       controllerMode.RPC_SendButtonUp (button, systemID.text, controllerID.text);
+    }
+#endif    
+  }
+  public void send2DAxisTouch (BaseEventData data)
+  {
+#if FUSION2
+    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
+    {
+      RectTransform rt = ((PointerEventData) data).pointerDrag.transform.parent.GetComponent <RectTransform> ();
+      Rect bounds = rt.rect;
+      Vector2 localPoint;
+      RectTransformUtility.ScreenPointToLocalPointInRectangle(
+          rt,
+          ((PointerEventData) data).position,
+          ((PointerEventData) data).pressEventCamera,
+          out localPoint
+      );
+      string touch = ((PointerEventData) data).pointerDrag.name;
+      Vector2 value = new Vector2 (Mathf.InverseLerp(bounds.xMin, bounds.xMax, localPoint.x) * 2.0f - 1.0f,
+                                   Mathf.InverseLerp(bounds.yMin, bounds.yMax, localPoint.y) * 2.0f - 1.0f);
+      Debug.Log ("Touch " + ((PointerEventData) data).pointerDrag.name + " " + ((PointerEventData) data).position + " " + bounds + " " + value);
+      controllerMode.RPC_Send2DAxisTouch (touch, value, systemID.text, controllerID.text);
     }
 #endif    
   }

@@ -179,13 +179,16 @@ public class VersatileControllerVirtual : MonoBehaviour
     {
       buttonDownEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
       buttonUpEvents = new Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> ();
+      touchEvents = new Dictionary <string, UnityEvent <string, Vector2, VersatileControllerVirtual>> ();
       sliderEvents = new Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> ();
 
       allButtonDownEvents = new UnityEvent <string, VersatileControllerVirtual> ();
       allButtonUpEvents = new UnityEvent <string, VersatileControllerVirtual> ();
+      allTouchEvents = new UnityEvent <string, Vector2, VersatileControllerVirtual> ();
       allSliderEvents = new UnityEvent <string, float, VersatileControllerVirtual> ();
 
       buttonState = new Dictionary <string, bool> ();
+      touchState = new Dictionary <string, Vector2> ();
       sliderState = new Dictionary <string, float> ();
       
       poseEvents = new UnityEvent<GameObject, Quaternion, Vector3> ();
@@ -200,6 +203,10 @@ public class VersatileControllerVirtual : MonoBehaviour
   private Dictionary <string, UnityEvent <string, VersatileControllerVirtual>> buttonUpEvents;
   private UnityEvent <string, VersatileControllerVirtual> allButtonUpEvents;
   private Dictionary <string, bool> buttonState;
+  
+  private Dictionary <string, UnityEvent <string, Vector2, VersatileControllerVirtual>> touchEvents;
+  private UnityEvent <string, Vector2, VersatileControllerVirtual> allTouchEvents;
+  private Dictionary <string, Vector2> touchState;
   
   private Dictionary <string, UnityEvent <string, float, VersatileControllerVirtual>> sliderEvents;
   private UnityEvent <string, float, VersatileControllerVirtual> allSliderEvents;
@@ -360,6 +367,29 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
   }
 
+  // Called from the physical controller to indicate a 2D axis value has changed.
+  public void Send2DAxisTouch (string touch, Vector2 value, string systemID, string controllerID)
+  {
+    classInitialize ();
+    if (touchEvents.ContainsKey (touch))
+    {
+      touchState[touch] = value;
+      touchEvents[touch].Invoke (touch, value, this);
+    }
+    allTouchEvents.Invoke (touch, value, this);
+
+    if (touch == "Primary2DAxis")
+    {
+      controllerState.primary2DAxis = value;
+      InputState.Change(controllerDevice, controllerState);
+    }
+    if (touch == "Secondary2DAxis")
+    {
+      controllerState.secondary2DAxis = value;
+      InputState.Change(controllerDevice, controllerState);
+    }
+  }
+
   // Called from the physical controller to indicate a slider value has changed.
   public void SendSliderChanged (string slider, float value, string systemID, string controllerID)
   {
@@ -427,7 +457,6 @@ public class VersatileControllerVirtual : MonoBehaviour
         controllerState.devicePosition = p;
         controllerState.isTracked = true;
         controllerState.trackingState = (int) (InputTrackingState.Position | InputTrackingState.Rotation);
-        Debug.Log ("Set rot: " + controllerState.deviceRotation + " " + controllerState.devicePosition);
         InputState.Change(controllerDevice, controllerState);
       }
     }
