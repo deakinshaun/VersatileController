@@ -22,7 +22,7 @@ This phone needs to be equipped with a gyroscope (most models are, but some do n
 
 1. Open Unity with the project you want to add the controller to.
 
-2. Install Photon Fusion 2. When prompted, provide the key: 5a39e88d-2532-4bfc-91b1-6f5a557bb91c
+2. Install Photon Fusion 2 (2.0.6 required if using runnable applications provide). When prompted, provide the key: 5a39e88d-2532-4bfc-91b1-6f5a557bb91c
 If you miss this step, the key can be set in Assets/Photon/Fusion/Resources/PhotonAppSettings.asset, as the App Id PUN (open the Server/Cloud Settings if you can't see this).
 
 3. You may receive a prompt to install TextMesh Pro. The TMP Essentials are required, so install these. 
@@ -77,3 +77,5 @@ Acknowledgements
 ================
 
 Buttons: http://www.holshousersoftware.com/glass/
+Universal Controller: https://github.com/Unity-Technologies/XR-Interaction-Toolkit-Examples/, Unity Companion License
+Hand Tracking: https://huggingface.co/unity/inference-engine-blaze-hand, Apache 2 License, Unity Evaluation License

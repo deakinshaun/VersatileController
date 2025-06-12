@@ -2,7 +2,6 @@ using UnityEngine;
 
 #if FUSION2
 using Fusion;
-#endif
 
 public class ControllerMode : NetworkBehaviour
 {
@@ -125,3 +124,4 @@ public class ControllerMode : NetworkBehaviour
     }
     
 }
+#endif

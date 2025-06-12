@@ -8,7 +8,6 @@ using UnityEngine.Events;
 #if FUSION2
 using Fusion;
 using Fusion.Sockets;
-#endif
 
 using TMPro;
 
@@ -78,3 +77,4 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
   public void OnSceneLoadStart(NetworkRunner runner) { }
   
 }
+#endif

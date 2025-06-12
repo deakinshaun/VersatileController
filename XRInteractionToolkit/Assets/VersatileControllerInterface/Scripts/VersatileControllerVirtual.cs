@@ -10,6 +10,7 @@ using Fusion;
 
 //////////////////////////////////////////////////////////////////
 // For registering the controller with the unity input system.
+#if UNITY_XR_INSTALLED
 using UnityEngine.Scripting;
 
 using UnityEngine.InputSystem;
@@ -24,6 +25,7 @@ using UnityEngine.XR.Interaction.Toolkit.Utilities;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 
 using System.Runtime.InteropServices;
+#endif
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -52,8 +54,10 @@ public class VersatileControllerVirtual : MonoBehaviour
   public Skins [] skins;
   
   // Input system state and controller.
+#if UNITY_XR_INSTALLED  
   XRController controllerDevice = null;
   VersatileControllerState controllerState;
+#endif  
   
   // Event for tracking when new controllers are added.
   private static UnityEvent<GameObject> newControllers;
@@ -125,7 +129,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     classInitialize ();
     
     setSkin (skinName, isLeftHanded);
-    
+    Debug.Log ("Controller started");
     this.gameObject.name = name;
     // Can also be invoked by a keep alive message.
     if (!knownControllers.Contains (this.gameObject))
@@ -136,6 +140,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       newControllers.Invoke (this.gameObject);
       
       // Register to provide data via the input system.
+#if UNITY_XR_INSTALLED
       InputDeviceCharacteristics christic;
       string handname;
       if (isLeftHanded)
@@ -161,6 +166,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       controllerDevice = InputSystem.AddDevice (desc) as XRController;
       InputSystem.SetDeviceUsage (controllerDevice, handname);
       controllerState.Reset ();
+#endif      
     }
     
     nameUpdates.Invoke (name, isLeftHanded, skinName);
@@ -297,6 +303,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     allButtonDownEvents.Invoke (button, this);
     
     // Manage input system, on specific controls.
+#if UNITY_XR_INSTALLED
     if (button == "Trigger")
     {
       controllerState.trigger = 1.0f;
@@ -324,6 +331,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, true);
       InputState.Change(controllerDevice, controllerState);
     }
+#endif    
   }
   
   // Called from the physical controller to indicate a button has been released.
@@ -338,6 +346,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     allButtonUpEvents.Invoke (button, this);
     
     // Manage input system, on specific controls.
+#if UNITY_XR_INSTALLED
     if (button == "Trigger")
     {
       controllerState.trigger = 0.0f;
@@ -365,6 +374,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, false);
       InputState.Change(controllerDevice, controllerState);
     }
+#endif    
   }
 
   // Called from the physical controller to indicate a 2D axis value has changed.
@@ -378,6 +388,7 @@ public class VersatileControllerVirtual : MonoBehaviour
     }
     allTouchEvents.Invoke (touch, value, this);
 
+#if UNITY_XR_INSTALLED
     if (touch == "Primary2DAxis")
     {
       controllerState.primary2DAxis = value;
@@ -388,6 +399,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       controllerState.secondary2DAxis = value;
       InputState.Change(controllerDevice, controllerState);
     }
+#endif    
   }
 
   // Called from the physical controller to indicate a slider value has changed.
@@ -451,6 +463,7 @@ public class VersatileControllerVirtual : MonoBehaviour
       transform.localPosition = p;
 
       // Update input system.
+#if UNITY_XR_INSTALLED
       if (controllerDevice != null)
       {
         controllerState.deviceRotation = o;
@@ -459,19 +472,23 @@ public class VersatileControllerVirtual : MonoBehaviour
         controllerState.trackingState = (int) (InputTrackingState.Position | InputTrackingState.Rotation);
         InputState.Change(controllerDevice, controllerState);
       }
+#endif      
     }
   }
 
   void OnDestroy()
   {
+#if UNITY_XR_INSTALLED
     controllerState.isTracked = false;
     controllerState.trackingState = default;
     Debug.Log ("Disabling versatile controller");
     InputState.Change (controllerDevice, controllerState);
+#endif    
   }
 
 }
 
+#if UNITY_XR_INSTALLED
 // Set up the versatile controller, as a registered controller for the input system.
 #if UNITY_EDITOR
 [InitializeOnLoad]
@@ -588,3 +605,4 @@ public class VersatileController : XRController
         base.FinishSetup();   
     }
 }
+#endif
