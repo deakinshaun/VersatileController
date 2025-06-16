@@ -12,7 +12,7 @@ using Fusion;
 using Fusion.Sockets;
 #endif
 
-public class VersatileControllerPhysical : MonoBehaviour
+public class VersatileControllerPhysical : NetworkBehaviour
 {
   [System.Serializable]
   public class Skins
@@ -29,17 +29,17 @@ public class VersatileControllerPhysical : MonoBehaviour
   [Header ("Default Controller Widgets")]
   [Tooltip ("Canvas for this set of widgets, so they can be switched on and off as a group")]
   public Canvas defaultControls;
-#if FUSION2
+  #if FUSION2
   public TMP_InputField systemID;
   public TMP_InputField controllerID;
-#endif  
+  #endif  
   [Tooltip ("Status display")]
-#if FUSION2
+  #if FUSION2
   public TextMeshProUGUI statusText;
   public Toggle leftHandToggle;
   public Toggle rightHandToggle;
   public TMP_Dropdown skinSelection;
-#endif
+  #endif
   
   [SerializeField]
   public Skins [] skins;
@@ -48,18 +48,16 @@ public class VersatileControllerPhysical : MonoBehaviour
   private Vector3 restPosition = Vector3.zero;
   
   private PhotonManagerPhysical photonManager;
-
+  
   private GameObject ARTrackable;
   
   // Used to indicate when this script is directly setting a field in a UI element. Stops
   // event handlers from responding.
   private bool directlySetting = false;
   private bool setSkins = false;
-
+  
   private NetworkRunner networkRunner;
   private PlayerRef networkPlayer;
-
-  private ControllerMode controllerMode;
   
   // Called to initialize controller interface, with details of the system and 
   // controller IDs used.
@@ -73,7 +71,7 @@ public class VersatileControllerPhysical : MonoBehaviour
     addSkins ();
     directlySetting = true;
     photonManager = pm;
-#if FUSION2    
+    #if FUSION2    
     systemID.text = sid;
     controllerID.text = cid;
     leftHandToggle.isOn = left;
@@ -86,17 +84,11 @@ public class VersatileControllerPhysical : MonoBehaviour
     }
     skinSelection.SetValueWithoutNotify (option);
     skinSelection.RefreshShownValue ();
-#endif
+    #endif
     
     panelVisibility ();
-
+    
     directlySetting = false;    
-  }
-  
-  public void setControllerMode (ControllerMode cm)
-  {
-    Debug.Log ("Set Controller");
-    controllerMode = cm;
   }
   
   // Set current pose as the "zero" state.
@@ -108,76 +100,77 @@ public class VersatileControllerPhysical : MonoBehaviour
   
   public void sendButtonDown (string button)
   {
-#if FUSION2    
+    #if FUSION2    
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
-      controllerMode.RPC_SendButtonDown (button, systemID.text, controllerID.text);
+      RPC_SendButtonDown (button, systemID.text, controllerID.text);
     }
-#endif    
+    #endif    
   }
   public void sendButtonUp (string button)
   {
-#if FUSION2
+    #if FUSION2
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
-      controllerMode.RPC_SendButtonUp (button, systemID.text, controllerID.text);
+      RPC_SendButtonUp (button, systemID.text, controllerID.text);
     }
-#endif    
+    #endif    
   }
   public void send2DAxisTouch (BaseEventData data)
   {
-#if FUSION2
+    #if FUSION2
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
       RectTransform rt = ((PointerEventData) data).pointerDrag.transform.parent.GetComponent <RectTransform> ();
       Rect bounds = rt.rect;
       Vector2 localPoint;
       RectTransformUtility.ScreenPointToLocalPointInRectangle(
-          rt,
-          ((PointerEventData) data).position,
-          ((PointerEventData) data).pressEventCamera,
-          out localPoint
+        rt,
+        ((PointerEventData) data).position,
+                                                              ((PointerEventData) data).pressEventCamera,
+                                                              out localPoint
       );
       string touch = ((PointerEventData) data).pointerDrag.name;
       Vector2 value = new Vector2 (Mathf.InverseLerp(bounds.xMin, bounds.xMax, localPoint.x) * 2.0f - 1.0f,
                                    Mathf.InverseLerp(bounds.yMin, bounds.yMax, localPoint.y) * 2.0f - 1.0f);
       Debug.Log ("Touch " + ((PointerEventData) data).pointerDrag.name + " " + ((PointerEventData) data).position + " " + bounds + " " + value);
-      controllerMode.RPC_Send2DAxisTouch (touch, value, systemID.text, controllerID.text);
+      RPC_Send2DAxisTouch (touch, value, systemID.text, controllerID.text);
     }
-#endif    
+    #endif    
   }
   public void sendSliderChanged (string slider, float value)
   {
-#if FUSION2
+    #if FUSION2
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
-      controllerMode.RPC_SendSliderChanged (slider, value, systemID.text, controllerID.text);
+      RPC_SendSliderChanged (slider, value, systemID.text, controllerID.text);
     }
-#endif    
+    #endif    
   }
-    
+  
   private float announcementTimer = 0.0f;
   private float announcementLimit = 2.0f; // The time delay between new announcements of this controller.
   private void announceController ()
   {
-#if FUSION2
+    #if FUSION2
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
       announcementTimer += Time.deltaTime;
       
       if (announcementTimer > announcementLimit)
       {
-        controllerMode?.RPC_ControllerStarted (controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
+        Debug.Log ("Send: started " + controllerID.text + " " + skinSelection.options[skinSelection.value].text);
+        RPC_ControllerStarted (controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
         announcementTimer = 0.0f;
       }
     }
-#endif    
+    #endif    
   }
   
   // One of the system/controller IDs have changed. Reconnect.
   public void changeConnection (string value)
   {
-#if FUSION2
+    #if FUSION2
     if (!directlySetting)
     {
       if (photonManager != null)
@@ -186,12 +179,12 @@ public class VersatileControllerPhysical : MonoBehaviour
         photonManager.reconnect ();
       }
     }
-#endif    
+    #endif    
   }
   
   private void reportStatus ()
   {
-#if FUSION2
+    #if FUSION2
     if (networkRunner?.IsConnectedToServer == true)
     {
       statusText.text = "Connected to region: " + networkRunner.SessionInfo.Region;
@@ -200,7 +193,7 @@ public class VersatileControllerPhysical : MonoBehaviour
     {
       statusText.text = "Disconnected";
     }
-#endif    
+    #endif    
   }
   
   // Set the visibility of the various panels, based on the current skin.
@@ -217,13 +210,13 @@ public class VersatileControllerPhysical : MonoBehaviour
         g.SetActive (false);
       }
     }
-
-#if FUSION2
+    
+    #if FUSION2
     // Switch the active skin on.
     foreach (Skins s in skins)
     {
       if ((s.name == skinSelection.options[skinSelection.value].text) && 
-          ((s.whichHand == VersatileControllerHandedness.BothHands) || ((s.whichHand == VersatileControllerHandedness.LeftHanded) == leftHandToggle.isOn)))
+        ((s.whichHand == VersatileControllerHandedness.BothHands) || ((s.whichHand == VersatileControllerHandedness.LeftHanded) == leftHandToggle.isOn)))
       {
         Debug.Log ("Enable: " + s.name);
         foreach (GameObject g in s.panels)
@@ -232,7 +225,7 @@ public class VersatileControllerPhysical : MonoBehaviour
         }
       }
     }    
-#endif    
+    #endif    
   }
   
   private void addSkins ()
@@ -247,10 +240,10 @@ public class VersatileControllerPhysical : MonoBehaviour
           options.Add (s.name);
         }
       }
-#if FUSION2
+      #if FUSION2
       skinSelection.ClearOptions ();
       skinSelection.AddOptions (options);
-#endif
+      #endif
       
       setSkins = true;
     }
@@ -258,7 +251,7 @@ public class VersatileControllerPhysical : MonoBehaviour
   
   private void setStatus ()
   {
-#if FUSION2
+    #if FUSION2
     if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
     {
       // Controls must only be enabled for the active controller - otherwise the imposter for another controller
@@ -284,7 +277,7 @@ public class VersatileControllerPhysical : MonoBehaviour
     {
       gameObject.SetActive (false);
     }
-#endif    
+    #endif    
   }
   
   void Start ()
@@ -327,30 +320,72 @@ public class VersatileControllerPhysical : MonoBehaviour
     {
       Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
       Vector3 position = getPosition () - restPosition;
-
-#if FUSION2      
-      controllerMode.RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
-                           position.x, position.y, position.z);
-#endif      
+      
+      #if FUSION2      
+      RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
+                                          position.x, position.y, position.z);
+      #endif      
     }
     else
     {
       if (SystemInfo.supportsGyroscope)
       {
-#if FUSION2
-    if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
+        #if FUSION2
+        if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
         {
           
           // Convert android to unity coordinates.
           Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
           Vector3 position = getPosition () - restPosition;
           
-          controllerMode.RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
-                               position.x, position.y, position.z);
+          RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
+                                              position.x, position.y, position.z);
         }
-#endif          
+        #endif          
       }
     }
+  }  
+  
+  #if FUSION2
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  #endif  
+  public void RPC_ControllerStarted (string name, bool isLeftHanded, string skinName) 
+  {
   }
-
+  
+  #if FUSION2
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  #endif  
+  public void RPC_SendButtonDown (string button, string systemID, string controllerID) 
+  {
+  }
+  
+  #if FUSION2
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  #endif  
+  public void RPC_SendButtonUp (string button, string systemID, string controllerID) 
+  {
+  }
+  
+  #if FUSION2
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  #endif  
+  public void RPC_Send2DAxisTouch (string touch, Vector2 value, string systemID, string controllerID) 
+  {
+  }
+  
+  #if FUSION2
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  #endif  
+  public void RPC_SendSliderChanged (string slider, float value, string systemID, string controllerID) 
+  {
+  }
+  
+  #if FUSION2
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  #endif  
+  public void RPC_SendControlInfo (float x, float y, float z, float w, float px, float py, float pz)
+  {
+  }
+    
 }

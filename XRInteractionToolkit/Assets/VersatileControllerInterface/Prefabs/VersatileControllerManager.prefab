@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2565515277740461389}
-  - component: {fileID: 8128884313621441341}
+  - component: {fileID: 8648453187198708017}
   m_Layer: 0
   m_Name: VersatileControllerManager
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8128884313621441341
+--- !u!114 &8648453187198708017
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,6 +41,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 649163798542948570}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25bad4dcf4cc6a398827ca080d2250bf, type: 3}
+  m_Script: {fileID: 11500000, guid: 247293fdb2b580344a89e76dd4cda4c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  avatarPrefab: {fileID: 3900936491130785557, guid: f47749f02c63666adbae47df85622669, type: 3}
+  systemID: General

@@ -17,7 +17,7 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
 {
   [Tooltip ("The avatar representation on the virtual side of the controller")]
   public GameObject avatarPrefab;
-
+  
   [Tooltip ("The system ID for all your controllers. Set this to be distinct if you don't want other people's controllers being used in your experience")]
   public string systemID = "General";
   
@@ -25,28 +25,28 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
   
   async void Start()
   {
-#if FUSION2    
+    #if FUSION2    
     networkRunner = gameObject.AddComponent <NetworkRunner> ();
-        
-    await networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Server, SessionName = "ApplicationLobby" });
-#endif    
-  }
     
+    await networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Shared, SessionName = systemID });
+    #endif    
+  }
+  
   public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
   {
-#if FUSION2    
+    #if FUSION2    
     // base.OnJoinedRoom();
-    Debug.Log("Joined room with " + runner.ActivePlayers.Count () + " particpants");    
-
-    if (networkRunner.IsServer)
-    {
-        NetworkObject participant = networkRunner.Spawn (avatarPrefab, Vector3.zero, Quaternion.identity, player);
-        networkRunner.SetPlayerObject (player, participant);
-        // GameObject avatar = participant.gameObject;
-        // avatar.GetComponent <VersatileControllerPhysical> ().setPhotonManager (this, systemID, controllerID, isLeftHanded, skinName);
-    }
+    Debug.Log("Joined room " + runner.SessionInfo.Name + " with " + runner.ActivePlayers.Count () + " particpants, as player: " + player + " and player object: " + runner.GetPlayerObject (player)); 
     
-#endif    
+    // if (networkRunner.IsServer)
+    // {
+    //     NetworkObject participant = networkRunner.Spawn (avatarPrefab, Vector3.zero, Quaternion.identity, player);
+    //     networkRunner.SetPlayerObject (player, participant);
+    //     // GameObject avatar = participant.gameObject;
+    //     // avatar.GetComponent <VersatileControllerPhysical> ().setPhotonManager (this, systemID, controllerID, isLeftHanded, skinName);
+    // }
+    
+    #endif    
   }
   
   public void OnConnectedToServer(NetworkRunner runner) { }

@@ -181,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skinName: Controller Emulation
+  controllerPrefab: {fileID: 7247905527506269142, guid: 809915f0762a14d4183a367af26509f8, type: 3}
 --- !u!4 &121211913
 Transform:
   m_ObjectHideFlags: 0

@@ -26,10 +26,15 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   [Tooltip ("Skin - the name of the skin applied to this controller.")]
   public string skinName = "Controller Emulation";
   
+  [Tooltip ("The prefab for the physical controller")]
+  public GameObject controllerPrefab;
+  
   private NetworkRunner networkRunner;
   private PlayerRef networkPlayer;
   private bool setControlData = false;
-
+  
+  private GameObject controller;
+  
   // Define the system and controller IDs. These are stored persistently, so
   // are reused when the controller next reconnects.
   public void updateConnectionDetails (string sid, string cid, bool left, string skin)
@@ -74,11 +79,16 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   
   void Start()
   {
-#if FUSION2
+    #if FUSION2
     // connect ();
-#endif    
+    #endif    
   }
-
+  
+  void OnDestroy()
+  {
+      Destroy (controller);
+  }
+  
   // Restart the connection.
   public void reconnect ()
   {
@@ -88,17 +98,17 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   
   private IEnumerator connectCoroutine ()
   {
-#if FUSION2
+    #if FUSION2
     if (networkRunner == null)
     {
       networkRunner = gameObject.AddComponent <NetworkRunner> ();
     }
-        
-    Task t = networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Client, SessionName = "ApplicationLobby" });    
+    
+    Task t = networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Shared, SessionName = systemID });    
     yield return new WaitUntil (() => t.IsCompleted);
-#endif    
+    #endif    
   }
-
+  
   private bool connectionInProgress = false;
   private void connect ()
   {
@@ -113,12 +123,12 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   
   private IEnumerator disconnectCoroutine ()
   {
-#if FUSION2
+    #if FUSION2
     networkRunner.Disconnect (networkPlayer);
     Destroy (networkRunner);
     yield return null;
     networkRunner = null;
-#endif    
+    #endif    
   }
   
   private void disconnect ()
@@ -131,13 +141,26 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   
   public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
   {
-#if FUSION2
+    #if FUSION2
     // base.OnJoinedRoom();
-    Debug.Log("Joined room with " + runner.ActivePlayers.Count () + " particpants"); 
-    connectionInProgress = false;
-    networkPlayer = player;
-    setControlData = false;
-#endif    
+    if (player == runner.LocalPlayer)
+    {
+      Debug.Log("Joined room " + runner.SessionInfo.Name + " with " + runner.ActivePlayers.Count () + " particpants, as player: " + player + " and player object: " + runner.GetPlayerObject (player)); 
+      connectionInProgress = false;
+      networkPlayer = player;
+      setControlData = false;
+      
+      if (runner.GetPlayerObject (player) == null)
+      {
+        NetworkObject playerObject = runner.Spawn (controllerPrefab, Vector3.zero, Quaternion.identity, player);
+        runner.SetPlayerObject(player, playerObject);
+      }
+      controller = runner.GetPlayerObject (player).gameObject;
+      VersatileControllerPhysical vcp = controller.GetComponent <VersatileControllerPhysical> ();
+      
+      controller.transform.SetParent (transform);
+    }      
+    #endif    
   }
   
   private float reconnectInterval = 2.0f;
@@ -171,7 +194,7 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
         reconnectTimer = reconnectInterval;
         
         disconnect ();
-
+        
         connect ();
       }
     }
@@ -189,14 +212,14 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
       connect ();
     }
   }
-
+  
   public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) 
   { 
     Debug.Log ("Server shutdown: retrying connection");
     networkRunner.enabled = false;
     connectionInProgress = false;
   }
-
+  
   public void OnDisconnectedFromServer (NetworkRunner runner, NetDisconnectReason reason) 
   { 
     Debug.Log ("Server disconnected: retrying connection");
