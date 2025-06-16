@@ -21,6 +21,9 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
   [Tooltip ("The system ID for all your controllers. Set this to be distinct if you don't want other people's controllers being used in your experience")]
   public string systemID = "General";
   
+  [Tooltip ("Switch this off, if your application has its own controller representations, and you just want the sensor input from the controllers")]
+  public bool showControllerRepresentations = true;
+  
   private NetworkRunner networkRunner;
   
   async void Start()
@@ -38,14 +41,6 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
     // base.OnJoinedRoom();
     Debug.Log("Joined room " + runner.SessionInfo.Name + " with " + runner.ActivePlayers.Count () + " particpants, as player: " + player + " and player object: " + runner.GetPlayerObject (player)); 
     
-    // if (networkRunner.IsServer)
-    // {
-    //     NetworkObject participant = networkRunner.Spawn (avatarPrefab, Vector3.zero, Quaternion.identity, player);
-    //     networkRunner.SetPlayerObject (player, participant);
-    //     // GameObject avatar = participant.gameObject;
-    //     // avatar.GetComponent <VersatileControllerPhysical> ().setPhotonManager (this, systemID, controllerID, isLeftHanded, skinName);
-    // }
-    
     #endif    
   }
   
@@ -55,10 +50,10 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
   public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
   { 
     Debug.Log ("Player left: " + player);
-    if (networkRunner.IsServer)
-    {
-      networkRunner.Despawn (networkRunner.GetPlayerObject (player));
-    }
+    // if (networkRunner.IsServer)
+    // {
+    //   networkRunner.Despawn (networkRunner.GetPlayerObject (player));
+    // }
   }
   public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
   public void OnDisconnectedFromServer (NetworkRunner runner, NetDisconnectReason reason) { }

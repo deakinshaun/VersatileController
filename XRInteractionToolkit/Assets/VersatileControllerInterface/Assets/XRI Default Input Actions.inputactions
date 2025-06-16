@@ -92,6 +92,17 @@
                 },
                 {
                     "name": "",
+                    "id": "8b07f574-4290-45a1-b4ba-0a739adaa2d7",
+                    "path": "<VersatileControllerHead>/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4d22c160-9642-4784-bed3-f108d9099185",
                     "path": "<HandheldARInputDevice>/devicePosition",
                     "interactions": "",
@@ -116,6 +127,17 @@
                     "name": "",
                     "id": "30a88e64-475a-4a1c-aca0-80b6a2bc3327",
                     "path": "<HandheldARInputDevice>/deviceRotation",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "49e93b33-8714-4d4f-b98e-ad3c511d4610",
+                    "path": "<VersatileControllerHead>/deviceRotation",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -258,7 +280,7 @@
                 {
                     "name": "",
                     "id": "43a7b1a1-e99a-4346-a058-5b68c535729d",
-                    "path": "<XRHMD>/trackingState",
+                    "path": "<VersatileControllerHead>/trackingState",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -270,6 +292,17 @@
                     "name": "",
                     "id": "15eff92f-dac7-4e6e-986c-08b3f1e73fac",
                     "path": "<XRHMD>/isTracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Is Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f83eb612-3b77-4143-90e1-fe9af607fa24",
+                    "path": "<VersatileControllerHead>/isTracked",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

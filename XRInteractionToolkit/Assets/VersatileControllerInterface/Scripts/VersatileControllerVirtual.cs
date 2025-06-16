@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -129,7 +130,7 @@ public class VersatileControllerVirtual : NetworkBehaviour
     classInitialize ();
     
     setSkin (skinName, isLeftHanded);
-    Debug.Log ("Controller started");
+    Debug.Log ("Controller started " + name);
     this.gameObject.name = name;
     // Can also be invoked by a keep alive message.
     if (!knownControllers.Contains (this.gameObject))
@@ -156,16 +157,24 @@ public class VersatileControllerVirtual : NetworkBehaviour
       Debug.Log ("Starting controller: " + handname);
       var desc = new InputDeviceDescription
       {
-        product = nameof (VersatileController),
+        product = name,
         capabilities = new XRDeviceDescriptor
         {
-          deviceName = $"{nameof(VersatileController)} - {handname}",
+          deviceName = $"{name} - {handname}",
           characteristics = christic,
         }.ToJson (),
       };
-      controllerDevice = InputSystem.AddDevice (desc) as XRController;
-      InputSystem.SetDeviceUsage (controllerDevice, handname);
-      controllerState.Reset ();
+      try 
+      {
+        controllerDevice = InputSystem.AddDevice (desc) as XRController;
+        InputSystem.SetDeviceUsage (controllerDevice, handname);
+        controllerState.Reset ();
+      }
+      catch (ArgumentException e)
+      {
+        Debug.Log ("Failed to register an input system controller device named: " + name);
+        controllerDevice = null;
+      }
       #endif      
     }
     
@@ -495,6 +504,12 @@ public class VersatileControllerVirtual : NetworkBehaviour
   public void RPC_ControllerStarted (string name, bool isLeftHanded, string skinName) 
   {
     Debug.Log ("Controller started: " + name + " - " + skinName);
+    bool shouldShow = true;
+    shouldShow = Runner.gameObject.GetComponent <PhotonManagerVirtual> ().showControllerRepresentations;
+    if (!shouldShow)
+    {
+      skinName = "None";
+    }
     ControllerStarted (name, isLeftHanded, skinName);
   }
   
@@ -567,6 +582,14 @@ public static class VersatileControllerLayoutLoader
     InputSystem.RegisterLayout<VersatileController>(
       matches: new InputDeviceMatcher()
       .WithProduct(nameof (VersatileController)));
+
+    InputSystem.RegisterLayout<VersatileControllerHead>(
+      matches: new InputDeviceMatcher()
+      .WithProduct(nameof (VersatileControllerHead)));
+
+    InputSystem.RegisterLayout<VersatileControllerFeet>(
+      matches: new InputDeviceMatcher()
+      .WithProduct(nameof (VersatileControllerFeet)));
   }
 }
 
@@ -652,6 +675,24 @@ public struct VersatileControllerState : IInputStateTypeInfo
 [InputControlLayout(stateType = typeof(VersatileControllerState), commonUsages = new[] { "LeftHand", "RightHand" }, isGenericTypeOfDevice = false, displayName = "Versatile Controller", updateBeforeRender = true)]
 [Preserve]
 public class VersatileController : XRController
+{
+  protected override void FinishSetup()
+  {
+    base.FinishSetup();   
+  }
+}
+[InputControlLayout(stateType = typeof(VersatileControllerState), commonUsages = new[] { "LeftHand", "RightHand" }, isGenericTypeOfDevice = false, displayName = "Versatile Controller Head", updateBeforeRender = true)]
+[Preserve]
+public class VersatileControllerHead : XRController
+{
+  protected override void FinishSetup()
+  {
+    base.FinishSetup();   
+  }
+}
+[InputControlLayout(stateType = typeof(VersatileControllerState), commonUsages = new[] { "LeftHand", "RightHand" }, isGenericTypeOfDevice = false, displayName = "Versatile Controller Feet", updateBeforeRender = true)]
+[Preserve]
+public class VersatileControllerFeet : XRController
 {
   protected override void FinishSetup()
   {
