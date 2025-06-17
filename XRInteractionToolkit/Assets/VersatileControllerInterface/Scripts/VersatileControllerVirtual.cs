@@ -31,6 +31,13 @@ using System.Runtime.InteropServices;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
+#if !FUSION2    
+public class NetworkBehaviour : MonoBehaviour
+{
+}
+#endif
+
 //////////////////////////////////////////////////////////////////
 
 // This is the application side of the versatile controller. Use the public functions provided to subscribe
@@ -505,7 +512,9 @@ public class VersatileControllerVirtual : NetworkBehaviour
   {
     Debug.Log ("Controller started: " + name + " - " + skinName);
     bool shouldShow = true;
+#if FUSION2    
     shouldShow = Runner.gameObject.GetComponent <PhotonManagerVirtual> ().showControllerRepresentations;
+#endif    
     if (!shouldShow)
     {
       skinName = "None";
