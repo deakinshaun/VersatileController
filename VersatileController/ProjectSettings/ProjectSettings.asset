@@ -563,6 +563,9 @@ PlayerSettings:
   - serializedVersion: 3
     m_BuildTarget: Android
     m_Formats: 03000000
+  - serializedVersion: 3
+    m_BuildTarget: WebGL
+    m_Formats: 05000000
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -811,7 +814,7 @@ PlayerSettings:
   webGLTemplate: APPLICATION:Default
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
-  webGLCompressionFormat: 0
+  webGLCompressionFormat: 2
   webGLWasmArithmeticExceptions: 0
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
@@ -841,7 +844,7 @@ PlayerSettings:
     ReservedCFE: FUSION_LOGLEVEL_ERROR
     Standalone: FUSION_LOGLEVEL_ERROR
     VisionOS: FUSION_LOGLEVEL_ERROR
-    WebGL: FUSION_LOGLEVEL_ERROR
+    WebGL: FUSION_LOGLEVEL_ERROR;FUSION2;FUSION_WEAVER
     Windows Store Apps: FUSION_LOGLEVEL_ERROR
     XboxOne: FUSION_LOGLEVEL_ERROR
     iPhone: FUSION_LOGLEVEL_ERROR
@@ -954,6 +957,6 @@ PlayerSettings:
   hmiLoadingImage: {fileID: 0}
   platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
-  insecureHttpOption: 0
+  insecureHttpOption: 2
   androidVulkanDenyFilterList: []
   androidVulkanAllowFilterList: []

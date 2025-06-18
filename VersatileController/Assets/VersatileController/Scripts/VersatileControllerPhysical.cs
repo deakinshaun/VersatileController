@@ -319,7 +319,7 @@ public class VersatileControllerPhysical : NetworkBehaviour
     if (useAR && (ARTrackable != null))
     {
       Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
-      Vector3 position = getPosition () - restPosition;
+      Vector3 position = Quaternion.Inverse (restOrientation) *  (getPosition () - restPosition);
       
       #if FUSION2      
       RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,

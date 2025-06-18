@@ -4,7 +4,7 @@ A 3 DoF virtual reality controller supporting VR development on Unity
 ![Example application using the controller](Screenshots/applicationcontroller.png)
 ![Example application using the controller, with the hand skin](Screenshots/applicationhand.png)
 
-The versatile controller is an application for an android phone that turns the phone into a controller for virtual reality applications. The supporting software provides a virtual representation of the controller that can be integrated into Unity applications.
+The versatile controller is an application for a phone that turns the phone into a controller for virtual reality applications. The supporting software provides a virtual representation of the controller that can be integrated into Unity applications.
 
 ![View of the controller application](Screenshots/controllercontrols.png)
 ![View of the controller application, with the hand skin](Screenshots/controllerhand.png)
@@ -12,6 +12,15 @@ The versatile controller is an application for an android phone that turns the p
 There are some dependencies that have to be installed into any Unity project that employs the flexible controller. The instructions for adding these are below.
 
 By default this project uses a single (free and low capacity) license key for the photon library (which manages the network communication between controller and unity package). You can use it in this mode, but may run into issues if too many other users are using the package at the same time. Instructions near the bottom of the document describe how to get your own license key, and how to rebuild the android application.
+
+Project Structure
+=================
+
+This repository contains the following Unity projects:
+- VersatileController: This is the source for the controller application, capable of running on desktop, android phone (natively), or phone (via a supported web browser).
+- BalloonPop-Desktop-Events: A sample application using the controller, that runs on the desktop (e.g., in the Unity editor), and interacts with controllers using a set of events specific to the versatile controller.
+- XRInteractionToolkit: A sample application that can run on the desktop, or on virtual reality headsets. This uses the Unity input system to communicate with the controllers (i.e., the controllers can replace the native controllers supplied with the headset). The controller ID must be: VersatileControllerHead to control the camera view and VersatileController to manipulate the controllers.
+- Puppeteer-Desktop-InputSystem: A sample application that can run on the desktop. Several controllers are used to manipulate the head, hands and feet of the puppet. This uses the Unity input system. The controller ID must be: VersatileControllerHead for the head controls, VersatileController for the hands, and VersatileControllerFeet for the feet.
 
 Basic Installation Instructions
 ===============================
@@ -23,13 +32,13 @@ This phone needs to be equipped with a gyroscope (most models are, but some do n
 1. Open Unity with the project you want to add the controller to.
 
 2. Install Photon Fusion 2 (2.0.6 required if using runnable applications provide). When prompted, provide the key: e7b26908-a034-49cd-bf45-5e05f1ec4f2a
-If you miss this step, the key can be set in Assets/Photon/Fusion/Resources/PhotonAppSettings.asset, as the App Id PUN (open the Server/Cloud Settings if you can't see this).
+If you miss this step, the key can be set in Assets/Photon/Fusion/Resources/PhotonAppSettings.asset, as the App Id Fusion (open the Server/Cloud Settings if you can't see this).
 
 3. You may receive a prompt to install TextMesh Pro. The TMP Essentials are required, so install these. 
 
-4. Copy the VersatileControllerUnity folder from this repository into the Assets folder of your Unity project. 
+4. Copy the VersatileControllerInterface folder from one of the example projects in this repository (e.g., in the XRInteractionToolkit project) into the Assets folder of your Unity project. 
 
-5. Add the VersatileController prefab under this folder to your project.
+5. Add the VersatileControllerManager prefab under this folder to your project. You will need to set the Avatar Prefab property to the VersatileControllerAvatar prefab.
 
 6. You should now be able to run your Unity project, start the application on your phone and see the virtual version of the controller manipulated by the physical device.
 

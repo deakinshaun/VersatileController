@@ -20,7 +20,7 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   [Tooltip ("The system ID for all your controllers. Set this to be distinct if you don't want other people's controllers being used in your experience")]
   private string systemID = "General";
   [Tooltip ("The controller ID for this specific controllers. Use this to distinguish between different controllers in the same application (e.g. LeftHand and RighHand)")]
-  private string controllerID = "DefaultController";
+  private string controllerID = "VersatileController";
   [Tooltip ("Handedness - is the controller intended for left or right handed use.")]
   private bool isLeftHanded = true;
   [Tooltip ("Skin - the name of the skin applied to this controller.")]
@@ -96,17 +96,26 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
     connect ();
   }
   
+  protected async void StartGame () 
+  {
+    #if FUSION2
+    await networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Shared, SessionName = systemID });
+    #endif
+  }
+ 
   private IEnumerator connectCoroutine ()
   {
     #if FUSION2
+    Debug.Log ("Starting connection");
     if (networkRunner == null)
     {
       networkRunner = gameObject.AddComponent <NetworkRunner> ();
     }
     
-    Task t = networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Shared, SessionName = systemID });    
-    yield return new WaitUntil (() => t.IsCompleted);
+    StartGame ();
     #endif    
+    
+    yield return null;
   }
   
   private bool connectionInProgress = false;

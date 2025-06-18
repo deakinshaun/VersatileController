@@ -69,3 +69,5 @@ Assets/Photon/PhotonUnityNetworking/Resources/*
 !Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
 TextMesh Pro.meta
 TextMesh Pro/
+
+!Build/versatilecontroller3DoF.apk

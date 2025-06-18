@@ -2581,6 +2581,10 @@ PrefabInstance:
       propertyPath: avatarPrefab
       value: 
       objectReference: {fileID: 7247905527506269142, guid: d037bff06a84653478f934151680c194, type: 3}
+    - target: {fileID: 8648453187198708017, guid: ff17843e056c9c5b29328d3b7eae99f9, type: 3}
+      propertyPath: showControllerRepresentations
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
