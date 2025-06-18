@@ -137,7 +137,6 @@ public class VersatileControllerVirtual : NetworkBehaviour
     classInitialize ();
     
     setSkin (skinName, isLeftHanded);
-    Debug.Log ("Controller started " + name);
     this.gameObject.name = name;
     // Can also be invoked by a keep alive message.
     if (!knownControllers.Contains (this.gameObject))
@@ -177,7 +176,7 @@ public class VersatileControllerVirtual : NetworkBehaviour
         InputSystem.SetDeviceUsage (controllerDevice, handname);
         controllerState.Reset ();
       }
-      catch (ArgumentException e)
+      catch (ArgumentException)
       {
         Debug.Log ("Failed to register an input system controller device named: " + name);
         controllerDevice = null;
@@ -320,32 +319,35 @@ public class VersatileControllerVirtual : NetworkBehaviour
     
     // Manage input system, on specific controls.
     #if UNITY_XR_INSTALLED
-    if (button == "Trigger")
+    if (controllerDevice != null)
     {
-      controllerState.trigger = 1.0f;
-      controllerState.WithButton (VersatileControllerState.ControllerButton.TriggerButton, true);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if (button == "Grip")
-    {
-      controllerState.grip = 1.0f;
-      controllerState.WithButton (VersatileControllerState.ControllerButton.GripButton, true);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if ((button == "A") || (button == "X"))
-    {
-      controllerState.WithButton (VersatileControllerState.ControllerButton.PrimaryButton, true);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if ((button == "B") || (button == "Y"))
-    {
-      controllerState.WithButton (VersatileControllerState.ControllerButton.SecondaryButton, true);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if (button == "Menu")
-    {
-      controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, true);
-      InputState.Change(controllerDevice, controllerState);
+      if (button == "Trigger")
+      {
+        controllerState.trigger = 1.0f;
+        controllerState.WithButton (VersatileControllerState.ControllerButton.TriggerButton, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Grip")
+      {
+        controllerState.grip = 1.0f;
+        controllerState.WithButton (VersatileControllerState.ControllerButton.GripButton, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if ((button == "A") || (button == "X"))
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.PrimaryButton, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if ((button == "B") || (button == "Y"))
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.SecondaryButton, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Menu")
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
     }
     #endif    
   }
@@ -363,32 +365,35 @@ public class VersatileControllerVirtual : NetworkBehaviour
     
     // Manage input system, on specific controls.
     #if UNITY_XR_INSTALLED
-    if (button == "Trigger")
+    if (controllerDevice != null)
     {
-      controllerState.trigger = 0.0f;
-      controllerState.WithButton (VersatileControllerState.ControllerButton.TriggerButton, false);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if (button == "Grip")
-    {
-      controllerState.grip = 0.0f;
-      controllerState.WithButton (VersatileControllerState.ControllerButton.GripButton, false);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if ((button == "A") || (button == "X"))
-    {
-      controllerState.WithButton (VersatileControllerState.ControllerButton.PrimaryButton, false);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if ((button == "B") || (button == "Y"))
-    {
-      controllerState.WithButton (VersatileControllerState.ControllerButton.SecondaryButton, false);
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if (button == "Menu")
-    {
-      controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, false);
-      InputState.Change(controllerDevice, controllerState);
+      if (button == "Trigger")
+      {
+        controllerState.trigger = 0.0f;
+        controllerState.WithButton (VersatileControllerState.ControllerButton.TriggerButton, false);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Grip")
+      {
+        controllerState.grip = 0.0f;
+        controllerState.WithButton (VersatileControllerState.ControllerButton.GripButton, false);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if ((button == "A") || (button == "X"))
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.PrimaryButton, false);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if ((button == "B") || (button == "Y"))
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.SecondaryButton, false);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Menu")
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, false);
+        InputState.Change(controllerDevice, controllerState);
+      }
     }
     #endif    
   }
@@ -405,15 +410,18 @@ public class VersatileControllerVirtual : NetworkBehaviour
     allTouchEvents.Invoke (touch, value, this);
     
     #if UNITY_XR_INSTALLED
-    if (touch == "Primary2DAxis")
+    if (controllerDevice != null)
     {
-      controllerState.primary2DAxis = value;
-      InputState.Change(controllerDevice, controllerState);
-    }
-    if (touch == "Secondary2DAxis")
-    {
-      controllerState.secondary2DAxis = value;
-      InputState.Change(controllerDevice, controllerState);
+      if (touch == "Primary2DAxis")
+      {
+        controllerState.primary2DAxis = value;
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (touch == "Secondary2DAxis")
+      {
+        controllerState.secondary2DAxis = value;
+        InputState.Change(controllerDevice, controllerState);
+      }
     }
     #endif    
   }
@@ -510,7 +518,7 @@ public class VersatileControllerVirtual : NetworkBehaviour
   #endif  
   public void RPC_ControllerStarted (string name, bool isLeftHanded, string skinName) 
   {
-    Debug.Log ("Controller started: " + name + " - " + skinName);
+    // Debug.Log ("Controller started: " + name + " - " + skinName);
     bool shouldShow = true;
 #if FUSION2    
     shouldShow = Runner.gameObject.GetComponent <PhotonManagerVirtual> ().showControllerRepresentations;

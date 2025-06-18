@@ -22,7 +22,7 @@ This phone needs to be equipped with a gyroscope (most models are, but some do n
 
 1. Open Unity with the project you want to add the controller to.
 
-2. Install Photon Fusion 2 (2.0.6 required if using runnable applications provide). When prompted, provide the key: 5a39e88d-2532-4bfc-91b1-6f5a557bb91c
+2. Install Photon Fusion 2 (2.0.6 required if using runnable applications provide). When prompted, provide the key: e7b26908-a034-49cd-bf45-5e05f1ec4f2a
 If you miss this step, the key can be set in Assets/Photon/Fusion/Resources/PhotonAppSettings.asset, as the App Id PUN (open the Server/Cloud Settings if you can't see this).
 
 3. You may receive a prompt to install TextMesh Pro. The TMP Essentials are required, so install these. 
@@ -71,11 +71,13 @@ If your device does not support this, you can still use the 3 DoF rotational tra
 
 A relatively recent apk is included in the repository, so you can install this directly to your phone without needing to build the controller application. 
 
-A WebGL version can be accessed at: https://rawcdn.githack.com/deakinshaun/VersatileController/main/WebController/index.html
+A WebGL version can be accessed at: https://rawcdn.githack.com/deakinshaun/VersatileController/main/WebControllerV2.0/index.html
 
 Acknowledgements
 ================
 
 Buttons: http://www.holshousersoftware.com/glass/
+
 Universal Controller: https://github.com/Unity-Technologies/XR-Interaction-Toolkit-Examples/, Unity Companion License
+
 Hand Tracking: https://huggingface.co/unity/inference-engine-blaze-hand, Apache 2 License, Unity Evaluation License
