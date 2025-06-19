@@ -74,33 +74,7 @@ public static class CheckPackages
                 // No build target, ignore.
             }
         }
-        return;
-        
-        // Process all build target groups
-        // foreach (NamedBuildTarget group in NamedBuildTarget.All)
-        // {
-        //     Debug.Log ("Setting define: " + group + " " + symbol + " " + enable);
-        //     // if (group == BuildTargetGroup.Unknown) continue;
-        //     string defines = PlayerSettings.GetScriptingDefineSymbols(group);
-        //     var symbols = new System.Collections.Generic.HashSet<string>(defines.Split(';'));
-        // 
-        //     bool changed = false;
-        //     if (enable && symbols.Add(symbol))
-        //     {
-        //         changed = true;
-        //     }
-        //     else if (!enable && symbols.Remove(symbol))
-        //     {
-        //         changed = true;
-        //     }
-        // 
-        //     if (changed)
-        //     {
-        //         string updatedDefines = string.Join(";", symbols);
-        //         PlayerSettings.SetScriptingDefineSymbols(group, updatedDefines);
-        //         Debug.Log($"Updated define symbols for {group}: {(enable ? "Added" : "Removed")} {symbol}");
-        //     }
-        // }
+        return;        
     }
 }
 #endif
