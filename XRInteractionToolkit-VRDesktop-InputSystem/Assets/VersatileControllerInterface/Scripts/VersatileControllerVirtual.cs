@@ -563,7 +563,7 @@ public class VersatileControllerVirtual : NetworkBehaviour
   }
   
   #if FUSION2
-  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All, Channel = RpcChannel.Unreliable)]
   #endif  
   public void RPC_SendControlInfo (float x, float y, float z, float w, float px, float py, float pz)
   {

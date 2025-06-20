@@ -11721,6 +11721,7 @@ MonoBehaviour:
   leftHandToggle: {fileID: 6646266640388429243}
   rightHandToggle: {fileID: 2569859979102445391}
   skinSelection: {fileID: 3557876541936090897}
+  poseUpdatesPerSecond: 30
   skins:
   - name: Controller Emulation
     whichHand: 2

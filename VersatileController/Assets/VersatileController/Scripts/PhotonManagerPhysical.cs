@@ -107,6 +107,7 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   {
     #if FUSION2
     Debug.Log ("Starting connection");
+    networkRunner = gameObject.GetComponent <NetworkRunner> ();
     if (networkRunner == null)
     {
       networkRunner = gameObject.AddComponent <NetworkRunner> ();

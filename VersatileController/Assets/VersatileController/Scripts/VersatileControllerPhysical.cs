@@ -41,6 +41,9 @@ public class VersatileControllerPhysical : NetworkBehaviour
   public TMP_Dropdown skinSelection;
   #endif
   
+  [Tooltip ("Set a limit on the number of pose updates per second. Reduce for slow applications or congested networks")]
+  public float poseUpdatesPerSecond = 15.0f;
+  
   [SerializeField]
   public Skins [] skins;
   
@@ -149,7 +152,7 @@ public class VersatileControllerPhysical : NetworkBehaviour
   }
   
   private float announcementTimer = 0.0f;
-  private float announcementLimit = 2.0f; // The time delay between new announcements of this controller.
+  private float announcementLimit = 5.0f; // The time delay between new announcements of this controller.
   private void announceController ()
   {
     #if FUSION2
@@ -159,7 +162,7 @@ public class VersatileControllerPhysical : NetworkBehaviour
       
       if (announcementTimer > announcementLimit)
       {
-        Debug.Log ("Send: started " + controllerID.text + " " + skinSelection.options[skinSelection.value].text);
+        // Debug.Log ("Send: started " + controllerID.text + " " + skinSelection.options[skinSelection.value].text);
         RPC_ControllerStarted (controllerID.text, leftHandToggle.isOn, skinSelection.options[skinSelection.value].text);
         announcementTimer = 0.0f;
       }
@@ -311,37 +314,43 @@ public class VersatileControllerPhysical : NetworkBehaviour
       return Vector3.zero;
     }
   }
-  
+
+  private float timeSinceLastPoseUpdate = 0.0f;
   void Update()   
   {
     announceController ();
     
-    if (useAR && (ARTrackable != null))
+    timeSinceLastPoseUpdate += Time.deltaTime;
+    if (timeSinceLastPoseUpdate > 1.0f / poseUpdatesPerSecond)
     {
-      Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
-      Vector3 position = Quaternion.Inverse (restOrientation) *  (getPosition () - restPosition);
-      
-      #if FUSION2      
-      RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
-                                          position.x, position.y, position.z);
-      #endif      
-    }
-    else
-    {
-      if (SystemInfo.supportsGyroscope)
+      timeSinceLastPoseUpdate = 0.0f;
+      if (useAR && (ARTrackable != null))
       {
-        #if FUSION2
-        if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
+        Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
+        Vector3 position = Quaternion.Inverse (restOrientation) *  (getPosition () - restPosition);
+        
+        #if FUSION2      
+        RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
+                                            position.x, position.y, position.z);
+        #endif      
+      }
+      else
+      {
+        if (SystemInfo.supportsGyroscope)
         {
-          
-          // Convert android to unity coordinates.
-          Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
-          Vector3 position = getPosition () - restPosition;
-          
-          RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
-                                              position.x, position.y, position.z);
+          #if FUSION2
+          if ((networkRunner?.LocalPlayer == networkPlayer) || (networkRunner?.IsConnectedToServer == false))
+          {
+            
+            // Convert android to unity coordinates.
+            Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
+            Vector3 position = getPosition () - restPosition;
+            
+            RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
+                                                position.x, position.y, position.z);
+          }
+          #endif          
         }
-        #endif          
       }
     }
   }  
@@ -382,7 +391,7 @@ public class VersatileControllerPhysical : NetworkBehaviour
   }
   
   #if FUSION2
-  [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+  [Rpc(RpcSources.InputAuthority, RpcTargets.All, Channel = RpcChannel.Unreliable)]
   #endif  
   public void RPC_SendControlInfo (float x, float y, float z, float w, float px, float py, float pz)
   {
