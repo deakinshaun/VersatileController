@@ -61,6 +61,8 @@ public class VersatileControllerVirtual : NetworkBehaviour
   
   public Skins [] skins;
   
+  public bool leftHanded = false;
+  
   // Input system state and controller.
   #if UNITY_XR_INSTALLED  
   XRController controllerDevice = null;
@@ -136,6 +138,7 @@ public class VersatileControllerVirtual : NetworkBehaviour
     initialize ();
     classInitialize ();
     
+    leftHanded = isLeftHanded;
     setSkin (skinName, isLeftHanded);
     this.gameObject.name = name;
     // Can also be invoked by a keep alive message.
@@ -348,6 +351,16 @@ public class VersatileControllerVirtual : NetworkBehaviour
         controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, true);
         InputState.Change(controllerDevice, controllerState);
       }
+      if (button == "Primary2DAxisTouch")
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.Primary2DAxisTouch, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Secondary2DAxisTouch")
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.Secondary2DAxisTouch, true);
+        InputState.Change(controllerDevice, controllerState);
+      }
     }
     #endif    
   }
@@ -392,6 +405,18 @@ public class VersatileControllerVirtual : NetworkBehaviour
       if (button == "Menu")
       {
         controllerState.WithButton (VersatileControllerState.ControllerButton.MenuButton, false);
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Primary2DAxisTouch")
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.Primary2DAxisTouch, false);
+        controllerState.primary2DAxis = Vector2.zero;
+        InputState.Change(controllerDevice, controllerState);
+      }
+      if (button == "Secondary2DAxisTouch")
+      {
+        controllerState.WithButton (VersatileControllerState.ControllerButton.Secondary2DAxisTouch, false);
+        controllerState.secondary2DAxis = Vector2.zero;
         InputState.Change(controllerDevice, controllerState);
       }
     }
