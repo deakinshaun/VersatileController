@@ -62,6 +62,10 @@ public class VersatileControllerPhysical : NetworkBehaviour
   private NetworkRunner networkRunner;
   private PlayerRef networkPlayer;
   
+  // Used for control modes that provide position and orientation directly. These are combined with any other measures.
+  private Vector3 overridePosition;
+  private Quaternion overrideRotation = Quaternion.identity;
+  
   // Called to initialize controller interface, with details of the system and 
   // controller IDs used.
   public void setPhotonManager (PhotonManagerPhysical pm, string sid, string cid, bool left, string skin, NetworkRunner ns, PlayerRef np)
@@ -136,7 +140,7 @@ public class VersatileControllerPhysical : NetworkBehaviour
       string touch = ((PointerEventData) data).pointerDrag.name;
       Vector2 value = new Vector2 (Mathf.InverseLerp(bounds.xMin, bounds.xMax, localPoint.x) * 2.0f - 1.0f,
                                    Mathf.InverseLerp(bounds.yMin, bounds.yMax, localPoint.y) * 2.0f - 1.0f);
-      Debug.Log ("Touch " + ((PointerEventData) data).pointerDrag.name + " " + ((PointerEventData) data).position + " " + bounds + " " + value);
+      // Debug.Log ("Touch " + ((PointerEventData) data).pointerDrag.name + " " + ((PointerEventData) data).position + " " + bounds + " " + value);
       RPC_Send2DAxisTouch (touch, value, systemID.text, controllerID.text);
     }
     #endif    
@@ -288,33 +292,53 @@ public class VersatileControllerPhysical : NetworkBehaviour
     setStatus ();
   }
   
+  public void setOverridePosition (Vector3 p)
+  {
+    overridePosition = p;
+  }
+  
+  public void setOverrideRotation (Quaternion q)
+  {
+    overrideRotation = q;
+  }
+  
   private Quaternion getOrientation ()
   {
+    Quaternion rotation = overrideRotation;
     if (useAR && (ARTrackable != null))
     {
       Quaternion q = ARTrackable.transform.rotation * Quaternion.AngleAxis (-90, Vector3.right);
-      return new Quaternion (q.x, q.y, q.z, q.w);
+      rotation *= new Quaternion (q.x, q.y, q.z, q.w);
     }
     else
     {
       Quaternion q = InputSystem.GetDevice<UnityEngine.InputSystem.AttitudeSensor>().attitude.ReadValue ();
-      return new Quaternion (-q.x, -q.z, -q.y, q.w);
+      rotation *= new Quaternion (-q.x, -q.z, -q.y, q.w);
     }
+    return rotation;
   }
   
   private Vector3 getPosition ()
   {
+    Vector3 position = overridePosition;
     if (useAR && (ARTrackable != null))
     {
       Vector3 p = ARTrackable.transform.position;
-      return new Vector3 (p.x, p.y, p.z);
+      position += new Vector3 (p.x, p.y, p.z);
     }
     else
     {
-      return Vector3.zero;
+      position += Vector3.zero;
     }
+    
+    return position;
   }
 
+  public Quaternion getControllerOrientation ()
+  {
+    return getOrientation ();
+  }
+  
   private float timeSinceLastPoseUpdate = 0.0f;
   void Update()   
   {
@@ -344,7 +368,7 @@ public class VersatileControllerPhysical : NetworkBehaviour
             
             // Convert android to unity coordinates.
             Quaternion orientation = Quaternion.Inverse (restOrientation) * getOrientation ();
-            Vector3 position = getPosition () - restPosition;
+            Vector3 position = Quaternion.Inverse (restOrientation) *  (getPosition () - restPosition);
             
             RPC_SendControlInfo (orientation.x, orientation.y, orientation.z, orientation.w,
                                                 position.x, position.y, position.z);
