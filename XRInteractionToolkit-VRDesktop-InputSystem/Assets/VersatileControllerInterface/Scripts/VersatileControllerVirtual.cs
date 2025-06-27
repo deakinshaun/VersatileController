@@ -59,6 +59,8 @@ public class VersatileControllerVirtual : NetworkBehaviour
   [Tooltip ("Disable this if you want to manually set the position and rotation, using the control input. Otherwise the object this component is attached to will be driven directly by this component")]
   public bool setPose = true;
   
+  public bool controllerOffset = true;
+  
   public Skins [] skins;
   
   public bool leftHanded = false;
@@ -547,6 +549,7 @@ public class VersatileControllerVirtual : NetworkBehaviour
     bool shouldShow = true;
 #if FUSION2    
     shouldShow = Runner.gameObject.GetComponent <PhotonManagerVirtual> ().showControllerRepresentations;
+    controllerOffset = Runner.gameObject.GetComponent <PhotonManagerVirtual> ().controllerOffset;
 #endif    
     if (!shouldShow)
     {
@@ -592,7 +595,14 @@ public class VersatileControllerVirtual : NetworkBehaviour
   #endif  
   public void RPC_SendControlInfo (float x, float y, float z, float w, float px, float py, float pz)
   {
-    SendControlInfo (x, y, z, w, px, py, pz);
+    float offsetx = 0.0f;
+    float offsetz = 0.0f;
+    if (controllerOffset)
+    {
+      offsetz = 0.3f;
+      offsetx = leftHanded ? -0.1f : 0.1f;
+    }
+    SendControlInfo (x, y, z, w, px + offsetx, py, pz + offsetz);
   }
   
   

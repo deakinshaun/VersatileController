@@ -24,6 +24,9 @@ public class PhotonManagerVirtual : MonoBehaviour, INetworkRunnerCallbacks
   [Tooltip ("Switch this off, if your application has its own controller representations, and you just want the sensor input from the controllers")]
   public bool showControllerRepresentations = true;
   
+  [Tooltip ("Apply this when running on desktop. Forces controllers forward so they can be more easily seen.")]
+  public bool controllerOffset = true;
+  
   private NetworkRunner networkRunner;
   
   async void Start()
