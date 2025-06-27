@@ -80,7 +80,7 @@ If your device does not support this, you can still use the 3 DoF rotational tra
 
 A relatively recent apk is included in the repository, so you can install this directly to your phone without needing to build the controller application. 
 
-A WebGL version can be accessed at: https://rawcdn.githack.com/deakinshaun/VersatileController/main/WebControllerV2.01/index.html
+A WebGL version can be accessed at: https://rawcdn.githack.com/deakinshaun/VersatileController/main/WebControllerV2.02/index.html
 
 Acknowledgements
 ================
