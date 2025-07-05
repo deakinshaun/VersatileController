@@ -99,7 +99,7 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   protected async void StartGame () 
   {
     #if FUSION2
-    await networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Shared, SessionName = systemID });
+    await networkRunner.StartGame (new StartGameArgs () { GameMode = GameMode.Shared, SessionName = systemID, PlayerCount = 20 });
     #endif
   }
  
@@ -153,6 +153,13 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   {
     #if FUSION2
     // base.OnJoinedRoom();
+    Debug.Log("Player joined: " + runner.ActivePlayers.Count () + " particpants."); 
+    if (controller != null)
+    {
+      VersatileControllerPhysical vcp = controller.GetComponent <VersatileControllerPhysical> ();
+      vcp.reportStatus ();
+    }    
+    
     if (player == runner.LocalPlayer)
     {
       Debug.Log("Joined room " + runner.SessionInfo.Name + " with " + runner.ActivePlayers.Count () + " particpants, as player: " + player + " and player object: " + runner.GetPlayerObject (player)); 
@@ -171,6 +178,15 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
       controller.transform.SetParent (transform);
     }      
     #endif    
+  }
+  
+  public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
+  { 
+    if (controller != null)
+    {
+      VersatileControllerPhysical vcp = controller.GetComponent <VersatileControllerPhysical> ();
+      vcp.reportStatus ();
+    }        
   }
   
   private float reconnectInterval = 2.0f;
@@ -240,7 +256,6 @@ public class PhotonManagerPhysical : MonoBehaviour, INetworkRunnerCallbacks
   public void OnConnectedToServer(NetworkRunner runner) { }
   public void OnObjectExitAOI (NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
   public void OnObjectEnterAOI (NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-  public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
   public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
   public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
   public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }

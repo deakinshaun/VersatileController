@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -189,12 +190,12 @@ public class VersatileControllerPhysical : NetworkBehaviour
     #endif    
   }
   
-  private void reportStatus ()
+  public void reportStatus ()
   {
     #if FUSION2
     if (networkRunner?.IsConnectedToServer == true)
     {
-      statusText.text = "Connected to region: " + networkRunner.SessionInfo.Region;
+      statusText.text = "Connected to region: " + networkRunner.SessionInfo.Region + " - " + networkRunner.ActivePlayers.Count () + "/" + networkRunner.SessionInfo.MaxPlayers + " connections";
     }
     else
     {
